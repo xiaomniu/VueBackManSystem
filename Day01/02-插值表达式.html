@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 
+        目标：使用插值表达式 渲染数据 到网页
+        插值表达式：Vue的一种模板语法
+        作用：利用表达式进行插值渲染
+        语法：{{ 表达式 }}
+
+        注意点：
+            1. 使用的数据要存在
+            2. 支持的是表达式（可以运算出结果的），不是语句
+            3. 不能再标签中使用 {{ }}
+     -->
+</body>
+    <div id="app">
+        <p>{{ nickname }}</p>
+        <p>{{ nickname.substring(2) }}</p>
+        <p>{{ age >= 18 ? '成年' : '未成年' }}</p>
+        <p>{{ friend.name }} --- {{ friend.desc }}</p>
+        <!-- <p>{{ asdfasdfasd }}</p> -->
+        <!-- <p>{{ if (age>=18){console.log(2323)} }}</p> -->
+        <!-- <a href="{{ url }}">去百度</a> -->
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+        const app=new Vue({
+            el : "#app",
+            data : {
+                nickname: "字样道人",
+                age: 18,
+                friend : {
+                    name: "张三",
+                    desc: "热爱学习 Vue"
+                }
+            }
+        })
+    </script>
+</html>

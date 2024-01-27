@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        {{ msg }}
+        {{ count }}
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+        // 目标：理解响应式 特点
+        // 好处：不用再操心 视图 如何渲染了，把精力全部放在操作数据上面，只要数据变化，视图会自动更新
+        const app = new Vue({
+            el: '#app',
+            data: {
+                msg : '你好啊',
+                count: 100
+            }
+        })
+    </script>
+    
+</body>
+</html>

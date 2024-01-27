@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box{
+            width: 200px;
+            height: 200px;
+            border: 3px solid #000;
+            font-size: 30px;
+            margin-top: 10px;
+        }
+        .pink{
+            background-color: pink;
+        }
+        .big{
+            width: 300px;
+            height: 300px;
+        }
+        .father{
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            margin-top: 20px;
+        }
+        .son{
+            width: 100px;
+            height: 100px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 
+            动态 class
+            1. 设置对象：只有 当后面的表达式值 为 true 时，属性 才会 加入到 class 属性值中
+            2. 设置数组：一次性可以设置多个 属性值
+         -->
+        <div class="box" :class="{pink:colorFlag, big:bigFlag}">你好啊</div>
+        <div class="box" :class="['pink', 'big']">你好啊</div>
+    </div>
+    
+    <script src="../vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                username:'',
+                colorFlag : true,
+                bigFlag : true,
+                age:0
+            },
+            //methods 中存放函数
+            methods:{
+            }
+        })
+    </script>
+    
+</body>
+</html>

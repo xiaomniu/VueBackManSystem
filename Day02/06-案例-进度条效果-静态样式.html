@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .progress {
+            width: 400px;
+            height: 25px;
+            border-radius: 15px;
+            background-color: #272425;
+            border: 3px solid #272425;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+        }
+        .inner{
+            width: 50%;
+            height: 20px;
+            border-radius: 10px;
+            text-align: right;
+            position: relative;
+            background-color: #409eff;
+            background-size: 20px 20px;
+            box-sizing: border-box;
+            transition: all 1s;
+        }
+        .inner span{
+            position: absolute;
+            right: -20px;
+            bottom: -25px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="progress">
+            <div class="inner" :style="{width:percent+'%'}">
+                <span>{{percent}}%</span>
+            </div>
+        </div>
+
+        <button @click="percent= 25">设置 25%</button>
+        <button @click="percent= 50">设置 50%</button>
+        <button @click="percent= 75">设置 75%</button>
+        <button @click="percent=100">设置100%</button>
+    </div>
+    
+    <script src="../vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                percent:35,
+                activeIndex : 0,
+                list:[
+                    {id:1, name:'京东秒杀'},
+                    {id:2, name:'每日特价'},
+                    {id:3, name:'品类秒杀'}
+                ]
+            },
+            //methods 中存放函数
+            methods:{
+            }
+        })
+    </script>
+    
+</body>
+</html>

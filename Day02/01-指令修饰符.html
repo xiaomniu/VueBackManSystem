@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <h3>@keyup.enter -> 监听键盘 回车事件</h3>
+        <input @keyup="login" v-model="username" type="text">
+        <input @keyup.esc="login2" v-model="username" type="text">
+        <!-- 
+            按键修饰符：
+                键盘事件可用
+                    @keyup.修饰符
+                    @keydown.修饰符
+            @keyup.esc @keyup.enter 表示 用户按下了 Esc 或 回车 才会相应
+         -->
+    </div>
+    
+    <script src="../vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                username:'',
+                password:''
+            },
+            //methods 中存放函数
+            methods:{
+                // 如果 事件处理函数没有参数，默认会有一个事件对象传力过来，可以用 “ event ”参数接收
+                login(event){
+                    console.log(event)
+                    console.log('' + event.key + ' == ' + event.keyCode)
+                },
+                login2(){
+                    console.log("Esc 被按下")
+                }
+            }
+        })
+    </script>
+    
+</body>
+</html>

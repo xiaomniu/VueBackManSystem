@@ -1,0 +1,73 @@
+Vue 包 官网：v2.cn.vuejs.org
+这里引入包： <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script> -->
+Vue.js devtools 下载: 国内地址：https://chrome.zzzmh.cn/（极简插件）
+    下载完压缩包后，将里面的 *.crx 插件文件，拖入 在谷歌浏览器中 的扩展程序安装的地方 安装好后。点击插件上的 “详情” 按钮，将里面的 “允许访问文件网址” 选项开关  打开。
+
+************** Day01 **************
+指令：
+    v-html = "str"， 设置 元素的 innerHTML
+    v-show = "表达式"，表达的结果必须是 true 或 false，true就显示，false就隐藏。切换 display:none 来控制 显示隐藏，频繁切换 显示场景
+    v-if   = "表达式"，表达的结果必须是 true 或 false，true就显示，控制元素 显示/隐藏 （条件渲染）。基于条件判断，是否 创建 或 移除 元素节点。 不频繁 切换显示场景
+
+    v-on，注册事件=添加监听+提供处理逻辑。
+        v-on:事件名="内联语句"  
+        v-on:事件名="method中的函数名"。
+        简写 v-on:事件名 => @事件名
+        method函数中的 this 指向的是 当前的 Vue 实例
+    v-bind，动态设置 html 标签属性（如 src url title href 。。。）
+        v-bind:属性名="表达式"
+        简写 v-bind:属性名 => :属性名
+    v-for，基于 数据循环，多次渲染整个元素 --> 数组、对象、数字 ...
+        v-for = "(item,index) in 数组" :key="唯一标识"
+            item 表示每一项，index 表示下标
+            如果 用不到 index 只用到 item，则可以 使用省略写法：v-for = "item in 数组"
+            key，给列表添加一个唯一标识。便于Vue进行列表项的正确排序复用
+    v-model，只给 表单元素 使用，双向数据绑定 -> 可以快速 获取 或 设置 表单元素内容
+        只有表单元素才能 收集 用户 的 输入
+        1. 数据变化 -> 视图自送更新
+        2. 视图变化 -> 数据自动更新
+
+************** Day02 **************
+    数组中的元素改变 会触发界面重新渲染的 7中情况：push pop shift unshift splice sort reverse，都会改变原数组
+        Vue.$set(arr, index, content) 封装了 arr.splice(index, 1, content)
+
+    指令修饰符
+    指令修饰符 只用在 事件(普通事件 和 键盘事件) 和 v-model 上使用
+        键盘事件
+            @keyup.enter               只有键盘事件都可以使用
+            @keydown.esc               只有键盘事件都可以使用
+        普通事件
+            @事件名.stop 组织冒泡               所有事件都可以使用
+            @事件名.prevent 阻止默认行为        所有事件都可以使用
+        v-model
+            v-model.trim 去除首尾空格
+            v-model.number 转数字
+
+    v-bind 对应标签的 样式  增强 操作性
+    v-bind 针对 class类名  和  style行内样式  进行控制
+        语法：:class="对象/数组"
+        对象 -> 键就是类名，值是 布尔值。如果为 true，就加入class属性值中，否则 不加入 class属性值中
+        <div class="box" :class="{类名1: 布尔值, 类名2: 布尔值}"></div>
+        数组 -> 数组中所有的类，都会添加到盒子上的 class属性值中，本质就是一个class列表
+        <div class="box" :class="[类名1, 类名2, 类名3]"></div>
+
+        语法：:style="样式对象"
+        适用于 某个 具体属性 的动态设置
+        <div class="box" :style="{ CSS属性名1: CSS属性值, CSS属性名2: CSS属性值, CSS属性名3: CSS属性值}"></div>
+        
+    v-model 也 可以用在  文本框  单选框  复选框  文本域  下拉框
+        常见的表单元素都可以用 v-model 绑定关联  --> 快速  获取  或  设置  表单元素的值
+        他会根据  控件类型  自动选取  正确的方法  来更新元素
+            文本框  input:text          绑定   value
+            文本域  textarea            绑定   value
+            复选框  input:checkbox      绑定   checked
+            单选框  input:radio         绑定   checked
+            下拉框  select              绑定   value
+
+    computed 计算属性
+        基于 现有的数据， 计算出来的 新属性。依赖  的数据变化， 自动  重新计算
+        语法基础 / 计算属性 vs 方法 / 完整写法 / 成绩案例
+
+    watch 侦听器（监视器）
+        监视数据变化，执行一些业务逻辑 或 异步操作
+        语法基础 / 完整写法 / 案例

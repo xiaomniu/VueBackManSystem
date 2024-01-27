@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input{
+            width: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        姓：<input type="text" v-model="firstName">
+        +
+        名：<input type="text" v-model="lastName">
+        =
+        <span>{{fullName}}</span>
+        <br><br>
+        <button @click="change" >改名卡</button>
+    </div>
+    
+    <script src="../vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                firstName:'刘',
+                lastName: '备'
+            },
+            //methods 中存放函数
+            methods:{
+                change(){
+                    this.fullName = '黄忠'
+                }
+            },
+            computed:{
+                // 计算属性很重要的特性：带缓存，性能极强
+                // 在第一次使用该属性时进行计算，计算后将结果缓存起来，后面如果还有其他地方用到，会直接从缓存中取值，不会再次计算
+                // 如果在计算中参数计算的数据后续有更新，会再次自动重新计算，然后重复上述操作
+                
+                // 完整写法：即可以获取，也可以修改
+                fullName:{
+                    get(){
+                        return this.firstName + this.lastName 
+                    },
+                    set(newValue, oldValue){
+                        console.log(newValue + '--'+oldValue+'--'+this.fullName)
+                        // this.fullName = newValue
+                        // this.firstName = this.fullName.substring(0,1);
+                        // this.lastName = this.fullName.substring(1);
+                        this.firstName = newValue.substring(0,1);
+                        this.lastName = newValue.substring(1);
+                    }
+                }
+                
+                // 简单写法：可以获取使用，但不能被修改
+                // fullName(){
+                //     return this.firstName + this.lastName
+                // }
+            }
+        })
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{
+            border: 3px solid #000;
+            text-align: center;
+            width: 240px;
+        }
+        th,td{
+            border: 1px solid #000;
+        }
+        h3{
+            position: relative;
+        }
+        span{
+            position: absolute;
+            left: 145px;
+            top: -4px;
+            width: 16px;
+            height: 16px;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: #e63f32;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h3>小黑的礼物清单🚚<span>{{totalCount}}</span></h3>
+        <h3>小黑的礼物清单🚚<span>{{totalCount}}</span></h3>
+        <h3>小黑的礼物清单🚚<span>{{totalCount}}</span></h3>
+        <h3>小黑的礼物清单🚚<span>{{totalCount}}</span></h3>
+        
+        <table>
+            <tr>
+                <th>名字</th>
+                <th>数量</th>
+            </tr>
+            <tr v-for="(item, index) in list" :key="item.id">
+                <td>{{item.name}}</td>
+                <td>{{item.num}}</td>
+            </tr>
+        </table>
+        <!-- 目标：统计求和，求得礼物总数 -->
+        <p>礼物总数： {{totalCount}} 个</p>
+        <h3>噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫<span>{{getTotal()}}</span></h3>
+        <h3>噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫<span>{{getTotal()}}</span></h3>
+        <h3>噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫<span>{{getTotal()}}</span></h3>
+        <h3>噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫噫<span>{{getTotal()}}</span></h3>
+    </div>
+    
+    <script src="../vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                list:[
+                    {id : 1, name : '篮球', num : 1},
+                    {id : 2, name : '玩具', num : 2},
+                    {id : 3, name : '铅笔', num : 5},
+                ]
+            },
+            //methods 中存放函数
+            methods:{
+                getTotal(){
+                    console.log("methods 中的 方法")
+                    return this.list.reduce((sum, item) => sum+item.num, 0)
+                }
+            },
+            computed:{
+                // 计算属性很重要的特性：带缓存，性能极强
+                // 在第一次使用该属性时进行计算，计算后将结果缓存起来，后面如果还有其他地方用到，会直接从缓存中取值，不会再次计算
+                // 如果在计算中参数计算的数据后续有更新，会再次自动重新计算，然后重复上述操作
+                totalCount(){
+                    console.log("computed 中的 方法")
+                    // return this.list.reduce((sum, item) => sum+item.num, 0)
+                    let total = this.list.reduce((sum, item) => sum+item.num, 0)
+                    return total
+                }
+            }
+        })
+    </script>
+    
+</body>
+</html>

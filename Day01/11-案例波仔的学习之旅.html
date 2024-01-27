@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <button v-show="list_indx > 0" @click="list_indx--">上一页</button>
+        <img :src="list[list_indx]" :title="msg" alt="">
+        <button v-show="list_indx < list.length-1" @click="list_indx++">下一页</button>
+    </div>
+    
+    <script src="./vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                msg:"hello",
+                list_indx : 0,
+                list :[
+                    "./imgs/10-01.png",
+                    "./imgs/10-02.png",
+                    "./imgs/10-03.png",
+                    "./imgs/10-04.png",
+                    "./imgs/10-05.png",
+                    "./imgs/10-06.png"
+                ]}
+            })
+    </script>
+    
+</body>
+</html>

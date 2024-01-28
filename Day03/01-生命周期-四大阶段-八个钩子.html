@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA_Compatible" content="IE-edge, chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale-1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="app">
+            <div>
+                <h3>{{title}}</h3>
+                <div>
+                    <button @click="count--">-</button>
+                    <span>{{count}}</span>
+                    <button @click="count--">+</button>
+                </div>
+            </div>
+        </div>
+        <script src="../vue.js"></script>
+        <script>
+            const app = new Vue({
+                el:'#app',
+                data:{
+                    count:100,
+                    title:'计数器'
+                },
+                methods:{
+
+                },
+                computed:{
+
+                },
+                watch:{
+
+                },
+                /**
+                 * 生命周期：Vue 实例从创建到销毁的全部过程
+                 * 这个过程中有  四个阶段 和 八个 回调函数
+                */
+                beforeCreate(){
+                    // 此时 数据还没有 初始化完成，无法访问 数据
+                    console.log("beforeCreate", this.count)
+                },
+                created(){
+                    // 此时数据已经初始化完成，可以访问数据，所以推荐在此时 发送 ajax 请求
+                    console.log("created")
+                    // 此时 真实的 DOM 元素 还没有被 加载到 页面上，此时操作 DOM 并不能拿到 真正的 button 元素，只能拿到  渲染模板里的 button 元素
+                    console.log(document.querySelector('button'))
+                },
+                beforeMount(){
+                    console.log("beforeMount")
+                },
+                Mounted(){
+                    console.log("Mounted")
+                    // 在 此时 才能拿到 真实的 DOM元素
+                    console.log(document.querySelector('button'))
+                },
+                beforeUpdate(){
+                    console.log("beforeUpdate")
+                },
+                updated(){
+                    console.log("Updated")
+                },
+                beforeDestroy(){
+                    console.log("beforeDestroy")
+                    // 一般 在此时 清理 定时器 / 卸载事件，等全局数据的销毁操作
+                },
+                Destroyed(){
+                    console.log("Destroyed")
+                }
+            })
+        </script>
+    </body>
+</html>

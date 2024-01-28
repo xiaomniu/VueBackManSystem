@@ -1,3 +1,24 @@
+Node.js 是一个跨平台 Javascript 运行环境，相当于一个浏览器，使开发者可以搭建服务端的 Javascript 应用程序
+    后端程序：提供接口和数据
+    前端工程化：对代码压缩，转译，整合（使用各种工具，提升效率）
+指定安装 node-v16.19.0.msi 版本(为了兼容 后期学习的项目)
+下载地址：https://nodejs.org/download/release/v16.19.0/
+    默认情况下，我们在执行npm install -g XXXX下载全局包时，这个包的
+        默认存放路径位C:\Users\用户名\AppData\Roaming\npm\node_modules下，可以通过CMD指令npm root -g查看
+    自定义存放目录,在CMD窗口执行以下两条命令修改默认路径
+        npm config set prefix "C:\Program Files\nodejs\node_global"
+        npm config set cache "C:\Program Files\nodejs\node_cache"
+        或者 打开 C:\Program Files\nodejs\node_modules\npm\.npmrc 文件，修改如下：
+            prefix =C:\Program Files\nodejs\node_global
+            cache = C:\Program Files\nodejs\node_cache
+
+        设置镜像源：npm config set registry https://registry.npmmirror.com
+        查看下是否设置成功：npm config get registry
+        
+        npm i pnpm -g
+
+
+
 Vue 包 官网：v2.cn.vuejs.org
 这里引入包： <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script> -->
 Vue.js devtools 下载: 国内地址：https://chrome.zzzmh.cn/（极简插件）
@@ -71,3 +92,91 @@ Vue.js devtools 下载: 国内地址：https://chrome.zzzmh.cn/（极简插件�
     watch 侦听器（监视器）
         监视数据变化，执行一些业务逻辑 或 异步操作
         语法基础 / 完整写法 / 案例
+
+
+
+传智教育-vue基础案例  测试接口:
+https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
+************** Day03 **************
+    Vue 生命周期 和 生命周期的 四个阶段
+        Vue 什么时候可以 发送 初始化渲染请求？          -> 应该越早越好，但要在 Vue 自己的数据(如 data:{} 域中的数据) 初始化完成 后
+        Vue 什么时候可以 开始 操作Dom？                -> 至少得 Dom渲染 出来的时候 才可以        
+        Vue生命周期：
+            一个 Vue实例从 创建 到 销毁 的整个过程。
+            创建：New Vue()
+            1. 创建阶段：初始化 data:{} 域中的数据，处理成响应式特点的数据
+                beforeCreate()  ：创建前 回调函数
+                created()       ：创建后 回调函数，此时 Vue 应该在这个时间 进行 发送 初始化 渲染请求
+            2. 挂在阶段：将用户编写的 渲染模板代码 转化为 真正的 Html代码
+                beforeMount()   : 挂载前 回调函数
+                Mounted()       : 挂载后 回调函数，此时 Vue 应该在这个时间 进行 开始操作Dom
+            3. 更新阶段：只要 修改了Vue里的相应的数据 就会不断 的进行 更新视图，一直重复这个过程
+                beforeUpdate()  : 更新前 回调函数
+                Updated()       : 更新后 回到函数
+            4. 销毁阶段：app.$destroy() 可以手动触发 Vue实例 的销毁，一旦执行后，Vue之前的所有相关机制将不再正常使用
+                beforeDestroy() : 销毁前 回调函数
+                destroyed()     : 销毁后 回调函数
+
+    Vue 生命周期 钩子案例
+        新闻列表：希望 页面一加载 就把 数据渲染出来
+        输入框自动聚焦：页面一加载 自动 定位 到 输入框，将输入框 成为 焦点
+
+    Vue Cli 脚手架
+        使用步骤：
+        1. 全局安装（一次）：npm i @vue/cli@5.0.8 -g
+        2. 查看 Vue 版本：vue --version
+        3. 创建项目架子：vue create project-name（项目-不能用中文）
+        4. 启动项目：npm run server（找到 package.json）
+
+    脚手架 目录文件介绍
+        VUE-DEMO
+            node_modules            第三方包文件夹                         (目录)
+            publi                   放 html 文件的地方                     (目录)
+                favicon.ico         网站图标
+                index.html          index.html 模板文件                               （*** 3 ***）
+            src                     源代码目录 --> 以后写代码的文件夹       (目录)
+                assets              静态资源目录 --> 存放 图片、字体等
+                components          组件目录 --> 存放通用组件
+                App.vue             App 根组件  --> 项目运行看到的内容就在这里编写      （*** 2 ***）
+                main.js             入口文件  --> 打包或运行，第一个执行的文件          （*** 1 ***）
+            .gitignore              git忽略文件
+            babel.config.js         babel配置文件
+            jsconfig.json           js配置文件
+            package.json            项目配置文件  --> 包含项目名、版本号、scripts、依赖包 等
+            README.md               项目说明文档
+            vue.config.js           vue-cli 配置文件
+            yarn.lock               yarn锁文件，有 yarn 自动生成的，锁定安装版本（如果使用的是 npm 生成的工程，这个锁文件则是 package.lock.json
+
+        项目运行流程
+            npm run server 首先 找 main.js 文件，
+            main.js 文件中 会有以下几部分：
+                1. 导入 vue
+                    import Vue from 'vue'
+                2. 导入 App.vue
+                    import App from './App.vue'
+                3. 实例化 一个 Vue 对象，将 App.vue 渲染到 index.html 容器中
+                    new Vue({
+                        render: h=> h(App),
+                    }).$mount('#app')
+
+    组件化开发 & 根组件
+        组件化：一个页面可以拆分成一个个组件，每个组件有着自己的独立的  结构、样式、行为
+            便于 维护，利于 复用
+            组件分为： 根组件  和  普通组件
+        根组件：整个 应用最上层的组件，包裹 所有 普通小组件
+    App根组件
+        头部组件
+        导航组件
+        主体组件
+            商品组件01
+            商品组件02
+            ...
+        底部组件
+    
+    App.vue文件（单文件 组件）的 三个 组成部分
+        结构：templete（有且只能有一个肯元素）
+        样式：style（可支持less，需要装包）
+            让组件支持less
+                1. style标签，lang="less" 开启less功能
+                2. 装包：npm i less less-loader@5 -D
+        行为：js逻辑

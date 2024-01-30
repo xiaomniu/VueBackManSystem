@@ -1,10 +1,10 @@
 <template>
   <div class="app">
     <!-- 使用组件：把注册好的组件当作标签来使用 -->
-    <!-- <HmHeader></HmHeader> -->11111
-    <hm-header>33333</hm-header>44444
-    <hm-main>77777</hm-main>12222222
-    <hm-footer></hm-footer>55555
+    <!-- <HmHeader></HmHeader> -->
+    <hm-header></hm-header>
+    <hm-main></hm-main>
+    <hm-footer></hm-footer>
   </div>
 </template>
 <script>

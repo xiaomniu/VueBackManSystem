@@ -140,12 +140,12 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
                 App.vue             App 根组件  --> 项目运行看到的内容就在这里编写      （*** 2 ***）
                 main.js             入口文件  --> 打包或运行，第一个执行的文件          （*** 1 ***）
             .gitignore              git忽略文件
-            babel.config.js         babel配置文件
+            babel.config.js         babel配置文件（配置 js 怎么去降级）
             jsconfig.json           js配置文件
             package.json            项目配置文件  --> 包含项目名、版本号、scripts、依赖包 等
             README.md               项目说明文档
             vue.config.js           vue-cli 配置文件
-            yarn.lock               yarn锁文件，有 yarn 自动生成的，锁定安装版本（如果使用的是 npm 生成的工程，这个锁文件则是 package.lock.json
+            yarn.lock               yarn锁文件，有 yarn 自动生成的，锁定安装版本（如果使用的是 npm 生成的工程，这个锁文件则是 package-lock.json
 
         项目运行流程
             npm run server 首先 找 main.js 文件，
@@ -180,3 +180,199 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
                 1. style标签，lang="less" 开启less功能
                 2. 装包：npm i less less-loader@5 -D
         行为：js逻辑
+
+    普通组件 的 注册使用
+    组件 注册的两种方式：
+        1. 局部注册：只能在注册的组件内使用
+            创建 .vue 文件（三个部分  template script style）
+            在使用的组件内导入并注册
+        使用步骤：
+            当成 html 标签使用 `<组件名></组件名>`
+            如下：
+                import 组件对象 from '.vue文件路径'
+                import HmHeader from './components/HmHeader'
+                export default {
+                    // 局部注册
+                    components:{
+                        '组件名':组件对象,
+                        HmHeader:HmHeader
+                    }
+                }
+        注意：
+            组件名规范 --> 大驼峰命名法，如： HmHeader
+            
+        2. 全局注册：所有组件内都能使用
+            创建 .vue 文件（三个部分 template script style）
+            main.js 中进行全局注册
+        使用步骤：
+            当成 html 标签使用 `<组件名></组件名>`
+            在 main.js 文件中 进行 如下：
+                // 导入需要全局注册的组件
+                import HmButton from './components/HmButton'
+                // 调用 Vue.component 进行全局注册
+                // Vue.component('组件名', 组件对象)
+                Vue.component('HmButton', HmButton)
+        注意：
+            组件名规范 --> 大驼峰命名法，如 HmButton
+
+
+************** Day04 **************
+    组件的三大组成不分（结构/样式/逻辑）
+        scoped样式冲突 / data 是一个函数
+    组件通信
+        组件通信语法 / 父传子 / 子传父 / 非父子间传递
+    综合案例：小黑记事本（组件版）
+        拆分组件 / 渲染 / 添加 / 删除 / 统计 / 清空 / 持久化
+    进阶语法
+        v-model原理 / v-model应用于组件 / sync修饰符 / ref 和 $ref / $nextTick
+
+    结构：<templete>（有且只能有一个肯元素）
+    样式：<style>
+        全局样式（默认）：影响所有组件
+        局部样式：scoped下样式，只作用于当前组件
+    逻辑：<script>
+        el 根实例独有，
+        data 是一个函数
+        其他配置项 都和以前一样
+    
+    scoped 解决样式冲突
+        默认情况：写在组件中的样式会全局生效 --> 因此很容易造成多个组之间的样式冲突问题
+        1. 全局样式：默认组件中的样式会作用到全局
+        2. 局部样式：可以给组件加上 scoped 属性，可以让样式只作用于当前组件
+        scoped 原理：
+            1. 当前组件内都被添加 data-v-hash 值的属性
+            2. css 选择器都被添加 [data-v-hash值] 的属性选择器
+            最终效果：必须是当前组件的元素，才会有这个自定义属性，才会被这个样式 作用到
+    
+    data 是一个函数
+        一个组件的 data 选项必须是一个函数 --> 保证每个组件实例，维护 独立 的一份数据对象。
+        每次创建新的组件实例，都会新执行一次 data 函数，得到一个新对象。
+
+    组件通信
+    组件间通信，就是指 组件与组件 之间 的数据传递
+    1. 组件的数据是独立的，无法直接访问其他组件的数据
+    2. 想用其他组件的数据 就需要使用  组件通信  技术
+    组件间的通信方案
+        组件间的关系：父子关系  和  非父子关系
+        父子关系：
+            props：父 向 子 传递数据
+            $emit：子 向 父 传递数据
+        非父子关系：
+            provide & inject
+            eventbus（事件总线）
+        通用解决方案：Vuex（适合复杂业务场景）
+            
+    什么是 prop
+        prop 定义：组件上注册的一些 自定义属性
+        prop 作用：向子组件传递数据
+        特点：
+            可以传递 任意数量 的 prop
+            可以传递 任意类型 的 prop
+    prop 校验
+        为组件的 prop 指定 验证要求，不符合要求，控制台 就会有 错误提示，以便于 开发着，快速发现错误
+        语法：
+            1. 类型校验
+                props:{
+                    校验的属性名 : 类型 // Number  String  Boolen Array Object ...
+                }
+            2. 非空校验
+            3. 默认值
+            4. 自定义校验
+                // 完整的 校验语法
+                props:{
+                    校验的属性名 : {
+                        type : 类型,            // Number  String  Boolen Array Object ...
+                        required : true,        // 是否必填
+                        default : 默认值,        // 默认值
+                        validator (value) {     // 自定义校验逻辑
+                            return 是否通过校验
+                        }
+                    }
+                }
+    
+    prop & data 、单项数据流
+        共同点：都可以给组件提供数据。
+        区别：
+            data 的数据 都是自己的，可以 随便改
+            prop 的数据 是外部的，不能 直接改，要遵循  单向数据流
+        单向数据流：父级 prop 的数据更新，会向下流动，影响子组件。这个数据流动是 单向的。（谁的数据谁负责）
+    
+    v-model原理
+        v-model 本质上是一个 语法糖，例如应用在输入框上，就是 value属性 和 input事件 的合写
+        作用：提供 数据的双向绑定
+            数据变：视图跟着变 :value
+            视图变：数据跟着变 @input
+            <template>
+                <div id="app">
+                    <input v-model="msg" type="text">
+                    <input :value="msg" @input="msg=$event.target.value" type="text">
+                </div>
+            </template>
+
+    表单类组件封装
+        1. 表单类组件 封装 --> 实现 子组件 和 父组件数据 的双向绑定
+        父传子：数据 应该是父组件 props 传递 过来的，拆解 v-model 绑定数据
+        子传父：监听输入，子传父值 给 父组件修改
+        <BaseSelect :cityId="selectId" @事件名="selectId=$event">...</BaseSelect>
+        <select :value="cityId" @change="handleChange">...</select>
+        props:{
+            cityId:String
+        },
+        methods:{
+            handleChange(e){
+                this.$emit("事件名", e.target.value)
+            }
+        }
+
+    表单类组件封装 v-model 简化代码
+        2. 父组件 v-model简化代码，实现 子组件 和 父组件 数据 双向绑定
+        子组件中：props 通过 value 接收，事件触发 input
+        父组件中：v-model 给组件直接绑定数据
+        <select :value="value" @change="handleChange">...</select>
+        props:{
+            value : String
+        },
+        methods:{
+            handleChange(e){
+                this.$emit('input', e.target.value)
+            }
+        }
+
+    v-model 的局限性：
+        1. 数据名 必须叫 value
+        2. 事件名 必须叫 input
+        3. 一个标签只能使用一次 v-model
+        
+    .sync 修饰符 （可以解决 v-model 的局限性）
+        作用：可以实现 子组件 与 父组件数据 的 双向绑定，简化代码
+        特点：
+            prop属性名，可以 自定义，不局限于叫 value。
+            事件名，可以 自定义，不局限于叫 input
+        
+        本质：就是 :属性名  和  @update:属性名  合写
+
+        场景：封装弹框类的基础组件，自定义属性名为visible，用 true表示显示，false表示隐藏
+        <BaseDialog : visible.sync="isShow" >
+        <BaseDialog : visible="isShow" @update:visible="isShow=$event"
+        Props:{
+            visible : Boolean
+        },
+        this.$emit('update:visible', false)
+
+    ref 和 $ref
+        作用：利用 ref 和 $ref 可以用于 获取 Dom元素 或 组件实例
+        特点：查找范围 --> 当前组件内（更精确稳定）
+        获取Dom元素：
+            老方法：document.querySelector('input')（查找范围是 整个页面的第一个匹配上的元素）
+            新方法：
+                1. 目标标签 - 添加 ref 属性
+                <div ref="chartRef"> 我是渲染图表容器 </div>
+                2. 恰当时机，通过 this.$refs.xxx，获取目标标签
+                mounted(){
+                    console.log(this.$refs.chartRef)
+                }
+    Vue 异步更新、$nextTick
+        Vue 中的 数据更新  和  视图渲染  任务  是异步的。所以 会导致 数据变化后，需要更新的 Dom元素还没有 渲染出来，
+            此时 无法正确的操作到 Dom元素。
+        为了 解决这个问题，Vue 提供了 $nextTick() 回调函数，可以在视图更新后 第一时间 运行 设置好的 回调函数，在这
+            个时机  进行Dom元素操作 是正常的。

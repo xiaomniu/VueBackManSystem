@@ -6,14 +6,6 @@ import Vue from 'vue'
 // 2. 引入 App.vue 组件文件
 import App from './App.vue'
 
-/**
- * 全局注册组件
- * 1. 引入组件    import ... from ...
- * 2. 注册组件    Vue.component('组件名',组件对象)
- */
-import HmButton from './components/hm-button.vue'
-Vue.component('HmButton', HmButton)
-
 // 3. 设置 生产环境时的 提示，false 时 不显示
 Vue.config.productionTip = false
 

@@ -376,3 +376,322 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
             此时 无法正确的操作到 Dom元素。
         为了 解决这个问题，Vue 提供了 $nextTick() 回调函数，可以在视图更新后 第一时间 运行 设置好的 回调函数，在这
             个时机  进行Dom元素操作 是正常的。
+
+************** Day05 **************
+    自定义指令
+        基本语法（全局，局部注册）/ 指令的值 / v-loading 指令封装
+    插槽
+        默认插槽 / 具名插槽 / 作用域插槽
+    结合案例：商品列表
+        MyTag 组件封装 / MyTable组件封装
+    路由入门
+        单页应用程序 / 路由 / VueRouter 的基本使用
+
+    需求：当页面加载时，让元素获得焦点
+        可以使用 autofocus 属性，（但这个 属性 在 safari 浏览器中有兼容性问题）
+        在 mounted() 回调函数中，进行对 dom元素 获取后，再进行  this.$refs.inp.focus()
+
+    自定义指令：将一段 DOM 操作封装到自定义指令中
+        自己 定义的指令，可以封装一些 dom 操作，扩展额外功能
+        全局注册 - 语法
+            Vue.directive('指令名', {
+                "inserted"(el){
+                    // 可以 对 el 标签，扩展额外功能
+                    el.focus()
+                }
+            })
+        局部注册 - 语法
+            directives:{
+                "指令名":{
+                    inserted(){
+                        // 可以 对 el 标签，扩展额外功能
+                        el.focus()
+                    }
+                }
+            }
+    
+    指令的值
+        需求  实现一个 color 指令 ：传入不同的颜色，给标签设置文字颜色
+        语法：在绑定指令时，可以通过 “等号” 的形式 为指令 绑定 具体的参数值
+            <div v-color="color"> 测试内容 </div>
+            1. 通过 binding.value 可以拿到指令值
+            2. 指令值修改  会触发  update函数 执行，可以监听 指令值的变化，进行 Dom元素 更新操作
+            directives:{
+                color:{
+                    inserted(el, binding){
+                        el.style.color = binding.value
+                    }
+                },
+                update(el, binding){
+                    el.style.color = binding.value
+                }
+            }
+    
+    v-loading 指令封装
+        场景：实际开发过程中共，发送 请求需要时间，在请求的数据没有回来时，页面会处于空白状态 => 用户体验不好
+        需求：封装一个 v-loading指令，实现加载中 播放动图的效果
+        分析：
+            1. 本质 loading 效果 就是一个 蒙层，盖在盒子上
+            2. 数据请i去中，开启loading状态，添加蒙层
+            3. 数据请求完毕，关闭loading状态，移除蒙层
+        实现：
+            1. 准备一个 loading 类，通过伪元素定位，设置宽高，实现蒙层
+            2. 开启关闭 loading 状态（添加移除蒙层），本质 只 需要 添加移除类即可
+            3. 结合自定义指定的语法进行封装复用
+                insertd 中，binding.value 判断指令的值，设置默认状态
+                update 中，binding.value 判断指令的值，更新类名状态
+
+    插槽-默认插槽
+        作用：让组件内部的一些 结构 支持 自定义
+        需求：将需要多次显示的对话框，封装成一个组件
+        问题：组件的内容部分，不希望写死，希望能使用的时候 自定义
+        语法:
+            1. 组件内需要定制的结构部分,改用<slot></slot>占位
+            2. 使用组件时，<MyDialog>"{这里填写的内容，将替换子组件中的<slot><slot/>}"</MyDialog> 标签内部，传入结构 替换 slot
+    
+    插槽-后备插槽（默认值）
+        通过插槽 完成了 内容的定制，传什么显示什么，但是如果不传，则是显示空白
+        使用 “<slot>这里设置默认值<slot/>” 可以设置默认值
+
+    插槽-具名插槽
+        1. slot占位，给 name 属性起名字来区分
+        2. template配合 v-slot:插槽名 分发内容
+        简化写法：  v-slot:插槽名  =>  #插槽名
+
+    插槽-作用域插槽
+        作用域插槽：定义slot插槽的同时，是可以 传值 的。给 插槽 上可以 绑定数据，将来 使用组件时可以用。
+        场景：封装表格组件
+        1. 父传子，动态渲染表格内容
+        2. 利用默认插槽，定制操作列
+        3. 删除或查看都需要用到 当前id，属于组件内部数据 通过 作用域插槽 传值绑定，进而使用
+        基本使用步骤：
+            1. 给 slot 标签，以添加 属性的方式传值
+                <slot :id="item.id" msg="测试文本"></slot>
+            2. 所有添加的属性，都会被收集到一个对象中
+                {id : 3, msg : '测试文本'}
+            3. 在 template 中，通过 `#插槽名="obj"`接收，默认插槽名为 default’
+                <MyTable :list="list">
+                    <template #default="obj>
+                        <button @click="del(obj.id)">删除</button>
+                    </template>
+                </MyTable>
+
+    综合案例-商品列表
+        需求说明：
+            1. my-tag 标签组件封装
+            1.1 双击显示输入框，输入框获取焦点
+            1.2 失去焦点，隐藏输入框
+            1.3 回显标签信息
+            1.4 内容修改，回车 --> 修改标签信息
+            2. my-table 表格组件封装
+            2.1 动态传递表格数据渲染
+            2.2 表头支持用户自定义
+            2.3 主体支持用户自定义
+        
+    单页应用程序
+        优点：页面按需更新性能高，开发效率高，用户体验好
+        缺点：学习成本高，首屏加载慢，不利于SEO
+        应用场景：
+            系统类网站 / 内部网站 / 文档类网站 / 移动端站点
+        
+        页面按需更新：
+            前提：明确  访问路径   和  组件  的对应关系
+            路由：用来 确定 访问路径 和 组件 的对应关系
+
+        路由器：
+            设备 和 ip 映射关系
+        Vue中的路由：
+            路径  和  组件  的  映射  关系
+
+    VueRouter 的介绍
+        目标: 认识 插件 VueRouter，掌握 VueRouter的基本使用步骤
+        作用：修改地址栏路径时，切换显示匹配的组件
+        说明：Vue官方的一个 路由插件，是一个第三方包
+        官网：https://v3.router.vuejs.org/zh/
+
+    VueRouter 的 使用：
+        五个 基础 步骤：
+        1. 下载：下载 VueRouter 模块到当前工程，版本 3.6.5
+            npm i vue-router@3.6.5
+            yarn add vue-router@3.6.5
+        2. 引入
+            import VueRouter from 'vue-router'
+        3. 安装注册
+            Vue.use(VueRouter)
+        4. 创建路由对象
+            const router = new VueRouter()
+        5. 注入，将路由对象注入到 new Vue 实例中，建立关联
+            new Vue({
+                render : h(App),
+                router
+            }).$mount(''#app)
+        两个 核心 步骤：
+        1. 创建 需要的组件（views目录），配置路由规则
+            import Find from './views/Find.vue'
+            import My from './views/My.vue'
+            import Friend from './views/Friend.vue'
+            const router = new VueRouter({
+                routes:[
+                    //  {  地址栏路径, 组件}
+                    {path : '/find', component : Find},
+                    {path : '/my', component : My},
+                    {path : '/friend', component : Friend}
+                ]
+            })
+        2. 配置导航，配置路由出口（路径匹配的组件显示的位置）
+            <div class="footer_wrap">
+                <a href="#/find"> 发现音乐 </a>
+                <a href="#/my"> 我的音乐 </a>
+                <a href="#/friend"> 朋友 </a>
+            </div>
+            <div class="top">
+                <!-- router-view 是 VueRouter插件提供的组件 -->
+                <router-view></router-view>
+            </div>
+
+    组件存放目录问题（组件分类）
+        组件分类：
+            .vue文件 分两类：页面组件  和  复用组件
+        src/views 文件夹
+            主要存放  页面组件 - 页面展示，配置路由使用
+        src/components 文件夹
+            主要存放  复用组件 - 常用于复用
+    路由的封装抽离
+        问题：所有的路由配置代码都堆在main.js中不合适
+        目标：将路由模块代码 抽离 出来。拆分模块，便于维护
+        快速 引入组件：基于 @ 指代 src 目录，从 src 目录触发找组件
+        
+************** Day06 **************
+    声明式导航-导航链接
+        需求：实现导航高亮效果
+        vue_router 提供了一个全局组件router-link（取代<a></a> 标签）
+        1. 能跳转，配置 to 属性 指定路径（必填项），本质还是 <a> 标签，to属性值 无需加 “#”
+        2. 能高亮，默认就会提供高亮类名，可以直接设置高亮样式
+        <template>
+            <div class="footer_wrap">
+                <router-link to="/find">发现音乐</router-link>
+                <router-link to="/my">我的音乐</router-link>
+                <router-link to="/part">朋友</router-link>
+            </div>
+        </template>
+        好处：能跳转，能高亮（自带激活时的类名）
+
+    声明式导航 - 两个类名
+        说明：我们发现 router-link 自动给当前导航添加了 两个高亮类名
+        <a href="#/my" aria-current="page" class="router-link-exact-active router-link-active"> 我的音乐 </a>
+        1. "router-link-exact-active"   : 模糊匹配（用的多）
+        2. "router-link-active"         ：精确匹配
+        
+        自定义 这两个类名的名字（闲这两个类名 名字太长了）
+        count router = new VueRouter({
+            routes:[...],
+            linkActiveClass: "类名1",
+            linkExactActiveClass: "类名2",
+        })
+        <a href="#/my" aria-current="page" class="类名2 类名1"> 我的音乐 </a>
+
+    声明式导航 - 跳转传参
+        目标：在跳转  路由  时，进行传值
+        1. 查询参数传参     （比较适合 传  多个参数）
+            1. 语法格式：
+            to="/path?参数名=值&参数名=值"
+            2. 对应页面组件接收传递过来的值
+            $route.query.参数名
+
+        2. 动态路由传参
+            1. 配置动态路由
+            const router = new VueRouter({
+                routes:[
+                    ...,
+                    {
+                        path: '/search/:words',
+                        component: Search
+                    }
+                ]
+            })
+            2. 配置导航链接     （比较适合 传 单个参数）
+            to="/path/参数值"
+            3. 对应页面组件接收传递过来的值
+            $route.params.参数名
+            4. 如果 不是  必传  参数，可以在 “:words” 后面加 “?”，如 “path: '/search/:words?'”。然后 点击跳转 就不会出现 空白页
+    
+    Vue路由 - 重定向
+        问题：网页打开，url 默认是 “/” 路径，未匹配到组件时，会出现空白
+        说明：重定向 --> 匹配path后，强制跳转 path 路径
+        语法：{ path:匹配路径, redirect:重定向到的路径}
+        const router = new VueRouter({
+            routes:[
+                {path : '/', redirect : '/home'},
+                {path : '/home', component : Home},
+                {path : '/search/:words?', compnent : Search}
+            ]
+        })
+
+    Vue路由 - 404
+        作用：当路径找不到匹配时，给个提示页面
+        位置：配在路由最后
+        语法：path:'*'  （任意路径）- 前面不匹配就命中最后这个
+        import NotFind from '@/views/NotFind'
+        const router = new VueRouter({
+            routes:[
+                {path : '/', redirect : '/home'},
+                {path : '/home', component : Home},
+                {path : '/search/:words?', compnent : Search},
+                {path : '*', component : NotFind}
+            ]
+        })
+    
+    Vue路由 - 模式设置
+        问题：路由的路径 看起来 不自然，有一个 “ # ”。这种 显示模式  可以进行 切换
+        1. hash路由（默认）         例如：http://localhost:8080/#/home
+        2. history路由（常用）      例如：http://localhost:8080/home  （以后上线需要服务器端支持）
+
+    编程式导航 - 基本跳转
+        问题：点击按钮跳转如何实现？
+        编程式导航：用 JS 代码来 进行 跳转
+        两种语法：
+            1. path 路径跳转                （简易方便，用的最多）
+                this.$router.push('路由路径')
+                this.$router.push({
+                    path : '路由路径'
+                })
+            2. name 命名路由跳转            (适合 path 路径长的场景)
+                this.$router.push({
+                    name : '路由名'
+                })
+                然后在 index.js 中编写如下 代码，给 路由规则 命名：
+                { name : '路由名', path : '/path/xxx', compnent : XXX}
+    
+    编程式导航 - 路由传参
+        问题：点击搜索按钮，跳转需要如何传参？
+        方式：
+            查询参数传参
+            动态路由传参
+        1. path路径 跳转传参
+            1.1 query方式传参
+            this.$router.push('/路径?参数名1=参数值1&参数名2=参数值2')
+            this.$router.push({
+                path : '/路径',
+                query:{
+                    参数名1 : '参数值1',
+                    参数名2 : '参数值2'
+                }
+            })
+            1.2 动态路由方式传参
+            this.$router.push(`/search/${this.words}`)
+        2. name命名 路由传参
+            2.1 query方式传参
+            this.$router.push({
+                name : '路由名字',
+                query:{
+                    参数名1 : '参数值1',
+                    参数名2 : '参数值2'
+                }
+            })
+            2.2 动态路由方式传参
+            this.$router.push({
+                name : 'search_n',
+                params:{
+                    words : this.words
+                }
+            })

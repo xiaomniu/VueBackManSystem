@@ -695,3 +695,40 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
                     words : this.words
                 }
             })
+
+    组件缓存 keep-alive
+        问题：从面经页面  点到  详情页面，有点回来时。数据 又重新加载了一遍。不想重新加载，而是 回到 跳转前的 状态。
+        原因：路由跳转后，组件被销毁了，返回回来组件又被重新建立了，数据重新被加载了。
+        解决：利用 keep-alive 可以将组件 缓存下来
+
+        keep-alive 是 vue 的内置组件，当他包裹动态组件时，会缓存不活动的组件实例，而不是销毁他们。
+        keep-alive 是 一个 抽象组件：它自身不会渲染成一个 Dom 元素，也不会出现在 父组件链 中。
+            优点：在组件切换过程中 把切换出去的组件保留在内存中，防止重复渲染 DOM，减少加载时间及性能消耗，提高用户体验
+            <template>
+                <div class="h5-wrapper">
+                    <keep-alive>        
+                        <router-view></router-view>
+                    </keep-alive>
+                </div>
+            </template>
+        
+        keep-alive 的 三个属性
+            1. include：组件名数组，只有 匹配的组件都 会 被缓存
+            2. exclude：组件名数组，任何 匹配的组件都 不会 被缓存
+            3. max    ：最多可以缓存多少组件实例
+            <template>
+                <div class="h5-wrapper">
+                    <keep-alive :include="['组件名1','组件名2',...]">
+                        <router-view></router-view>
+                    </keep-alive>
+                </div>
+            </template>
+
+        keep-alive 使用 会触发两个生命周期函数
+            actived 当组件 被激活（使用）的时候 触发 --> 进入这个页面的时候触发
+            deactived 当组件 不被使用 的时候 触发 --> 离开这个页面的时候触发
+            组件缓存后 就不会 执行组件的 created，mounted，destroyed 等回调函数了
+            所以其提供了 actived 和 deactivated 回调，帮我们实现业务需求
+
+
+************** Day07 **************

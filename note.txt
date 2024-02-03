@@ -706,7 +706,7 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
             优点：在组件切换过程中 把切换出去的组件保留在内存中，防止重复渲染 DOM，减少加载时间及性能消耗，提高用户体验
             <template>
                 <div class="h5-wrapper">
-                    <keep-alive>        
+                    <keep-alive>
                         <router-view></router-view>
                     </keep-alive>
                 </div>
@@ -725,10 +725,176 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
             </template>
 
         keep-alive 使用 会触发两个生命周期函数
-            actived 当组件 被激活（使用）的时候 触发 --> 进入这个页面的时候触发
-            deactived 当组件 不被使用 的时候 触发 --> 离开这个页面的时候触发
+            activated 当组件 被激活（使用）的时候 触发 --> 进入这个页面的时候触发
+            deactivated 当组件 不被使用 的时候 触发 --> 离开这个页面的时候触发
             组件缓存后 就不会 执行组件的 created，mounted，destroyed 等回调函数了
-            所以其提供了 actived 和 deactivated 回调，帮我们实现业务需求
+            所以其提供了 activated 和 deactivated 回调，帮我们实现业务需求
+                如果当前 父组件 和 子组件  都添加了 activated 或 deactivated，则会先调用 子组件的  activated 或 deactivated方法，
+                然后再 调用 父组件 activated 或 deactivated 的方法
 
 
 ************** Day07 **************
+    element-ui 组件库（PC端的 UI库）
+    vant ui 组件库 (移动端的 UI库)
+        网址：https://vant-contrib.gitee.io/vant/v2/#/zh-CN/
+    
+    vant 全部导入 和 按需导入
+        目标：阅读文档，掌握 全部导入 的基本使用
+        官网：https://vant-contrib.gitee.io/vant/v2/#/zh-CN/
+
+        全部导入
+            1. 安装 vant-ui
+                npm i vant@latest-v2
+            2. main.sj 中注册
+                import Vant from 'vant'
+                import 'vant/lib/index.css'
+                //把 vant中所有的组件都导入了
+                Vue.use(Vant)
+            3. 使用测试
+                <van-button type="primary">主要按钮</van-button>
+                <van-button type="info">信息按钮</van-button>
+
+        按需导入
+            体积更小，但是每次都需要手动导入一下
+            1. 安装 babel 插件
+            2. 修改 babel 的配置
+            3. 重启服务器
+
+            1. 安装 vant-ui
+                npm i vant@latest-v2
+            2. 安装插件
+                npm i babel-plugin-import -D
+            3. babel.config.js 中配置
+                module.exports = {
+                    presets:[
+                        '@vue/cli-plugin-babel/preset'
+                    ],
+                    plugins:[
+                        ['import',{
+                            libraryName: 'vant',
+                            libraryDirectory: 'es',
+                            style: true
+                        }, 'vant']
+                    ]
+                }
+            4. main.js 中 按需导入 注册
+                import Vue from 'vue'
+                import { Button, Rate, NavBar } from 'vant';
+                import 'vant/lib/button/style';
+                import 'vant/lib/rate/style';
+                import 'vant/lib/nav-bar/style';
+                Vue.use(Button);
+                Vue.use(Rate);
+                Vue.use(NavBar);
+
+            5. 测试使用
+                <van-button type="primary">主要按钮</van-button>
+                <van-button type="info">信息按钮</van-button>
+
+            6. 提取到 vant-ui.js 中，main.js 导入
+                原因：所有组件都 main.js 中引入，会让 main.js 变得非常臃肿，所以将注册组件的所有代码抽取到 utils/vant-ui.js 文件中，在 main.js 重新引入即可
+                // 导入 按需导入的配置文件
+                import '@/utils/vant-ui'
+
+    项目中的 vw 适配
+        目标：基于 postcss 插件 实现 项目的 vw（viewport布局） 适配（如 屏幕宽度为 345px，按钮为 45px，则 这个按钮在 当前屏幕中的 vw 是 45/345*100 vw。就是占屏幕的比例）
+            less：css预处理器
+            postcss：css后处理器。主要处理兼容性问题  如：--webkit ，--firefox 前缀
+        安装 插件
+            npm i protcss-px-to-viewport@1.1.1 -D
+        根据目录 新建 postcss.config.js 文件，填入配置
+            //postcss.config.js
+            module.exports = {
+                plugins:{
+                    'postcss-px-to-viewport':{
+                        // 标准屏幕宽度
+                        viewportWidth: 375
+                    }
+                }
+            }
+
+    引入组件（官网：https://vant-contrib.gitee.io/vant/v2/#/zh-CN/quickstart#fang-shi-yi.-zi-dong-an-xu-yin-ru-zu-jian-tui-jian）
+        1. 自动按需引入组件 (推荐)
+            1. 安装插件
+            npm i babel-plugin-import -D
+            2. 对于使用 babel7 的用户，可以在 babel.config.js 中配置
+            module.exports = {
+            plugins: [
+                ['import', {
+                libraryName: 'vant',
+                libraryDirectory: 'es',
+                style: true
+                }, 'vant']
+            ]
+            };
+        
+        2. 手动 按需引入组件
+            import Button from 'vant/lib/button';
+            import 'vant/lib/button/style';
+
+        3. 一次性导入所有组件
+            import Vue from 'vue';
+            import Vant from 'vant';
+            import 'vant/lib/index.css';
+
+            Vue.use(Vant);
+
+    定制主题（官网：https://vant-contrib.gitee.io/vant/v2/#/zh-CN/theme）
+        1. 引入样式
+            1.1 自动按需引入样式（推荐）
+            在 babel.config.js 中配置按需引入样式源文件，注意 babel6 不支持按需引入样式，请手动引入样式。
+            module.exports = {
+                plugins: [
+                    [
+                    'import',
+                    {
+                        libraryName: 'vant',
+                        libraryDirectory: 'es',
+                        // 指定样式路径
+                        style: (name) => `${name}/style/less`,
+                    },
+                    'vant',
+                    ],
+                ],
+            };
+            1.2 引入全部样式
+            import 'vant/lib/index.less';
+
+            1.3 引入单个组件样式
+            import 'vant/lib/button/style/less';
+        
+        2. 如果 vue-cli 搭建的项目，可以在 vue.config.js 中进行配置。
+            // vue.config.js
+            module.exports = {
+            css: {
+                loaderOptions: {
+                less: {
+                    // 若 less-loader 版本小于 6.0，请移除 lessOptions 这一级，直接配置选项。
+                    lessOptions: {
+                    modifyVars: {
+                        // 直接覆盖变量
+                        'text-color': '#111',
+                        'border-color': '#eee',
+                        // 或者可以通过 less 文件覆盖（文件路径为绝对路径）
+                        hack: `true; @import "your-less-file-path.less";`,
+                    },
+                    },
+                },
+                },
+            },
+            };
+    
+************** Day08 **************
+    登录 和 注册功能
+        目标：将 axios 请求方法，封装到 request 模块
+        使用 axios 来 请求后端接口，一般都会对 axios 进行一些配置（比如：配置基础地址，请求相应拦截器 等）
+        所以项目开发中，都会对 axios 进行基本的 二次封装，单独封装到一个 request 模块中，便于维护
+        安装 axios --> npm i axios
+        新建 request 模块
+        创建实例，自定义配置，导出实例
+        测试使用
+
+        基地址：http://interview-api-t.itheima.net/
+        接口文档地址：https://apifox.com/apidoc/project-934563/api-20384515
+        
+        axios文档地址：

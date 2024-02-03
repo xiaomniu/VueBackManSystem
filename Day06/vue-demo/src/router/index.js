@@ -6,9 +6,15 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 // 引入组件对象
-import Home from '../views/Home.vue'
+import Layout from '../views/Layout.vue'
 //    @ 表示 src文件夹的 绝对路径
-import Search from '@/views/Search.vue'
+import ArticleDetail from '@/views/ArticleDetail.vue'
+
+import Article from '@/views/Article.vue'
+import Collect from '@/views/Collect.vue'
+import Like from '@/views/Like.vue'
+import User from '@/views/User.vue'
+
 import NotFound from '@/views/NotFound.vue'
 
 // 3. 安装注册 Vue.use(Vue插件)
@@ -17,15 +23,26 @@ Vue.use(VueRouter)
 // 4. 创建路由对象
 const router = new VueRouter({
   // history: 链接没有 # ，但需要后端支持（后端支持配置方法：https://v3.router.vuejs.org/zh/guide/essentials/history-mode.html）
-  mode : 'history',
+  // mode : 'history',
   // 配置规则：配置  路径  和  组件  的映射关系
   // 一个对象 代表 一条 规则：{ path : 路径, component : 组件}
   routes:[
     // redirect：表示 重定向 到指定的路径
-    {path : '/', redirect : '/home'},
-    {path : '/home', component : Home},
+    // {path : '/', redirect : '/home'},
+    {
+      path : '/',
+      component : Layout,
+      children:[
+        {path:'/article', component:Article},
+        {path:'/collect', component:Collect},
+        {path:'/like', component:Like},
+        {path:'/user', component:User}
+      ]
+    },
+    // {path : '/detail', component : ArticleDetail},
+    {path : '/detail/:id', component : ArticleDetail},
     // “ ? ” 表示可选参数，传不传参数都可以匹配到 这条路由 规则
-    {name : 'search_n', path : '/search/:words?', component : Search},
+    // {name : 'search_n', path : '/search/:words?', component : Search},
     // 路由配置末尾添加 * 来设置 404 页面组件
     {path : '*', component : NotFound}
   ]

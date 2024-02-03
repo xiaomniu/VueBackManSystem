@@ -2,9 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 
 // 默认会去 查找 文件夹下的 index.js
-import router from './router'
+import router from "./router"
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 // 全局注册指令
 // v-model v-if v-for：model if for 才是 指令名

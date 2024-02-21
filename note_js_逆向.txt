@@ -1,0 +1,222 @@
+
+************** Day01 **************
+    变量定义：
+        var 定义的变量 在各自的函数内部起作用
+        const let 定义的变量为 块级作用域
+    变量提升：
+        扫描整个函数体的语句，将所有申明变量提升到函数顶部
+    全局作用域
+        如果不指定 var、const、let 申明关键字来定义变量，该变量将被绑定到全局变量 windows 上
+    块级作用域
+        let、const、将作用在 for、while 等循环语句里，不能在外部访问到
+
+    高阶函数（回调函数）
+        定义：
+            接收另一个函数作为参数的函数被称作为高阶函数
+        用途：
+            回调：callback
+            数组操作：filter、sort、map、forEach
+    闭包
+        定义：
+        1. 函数的返回值可以作为函数
+        2. 所有的参数和变量都保存在返回函数中
+        3. 当调用返回函数时才会执行所有的运算逻辑
+        function closureFunc(a, b){
+            return function(i){
+                return Math.pow(a+b,i);
+            }
+        }
+        用途：
+        1. 匿名自执行函数
+        2. 封装
+        3. 结果缓存
+    
+    特殊对象
+        JSON：
+            1. JSON、对象的序列化 / 反序列化操作
+            2. JSON.stringify 序列化
+            3. JSON.parse 反序列化
+        Date：
+            1. JS 的时间操作对象
+            2. new Date(dateString)
+
+
+    事件循环
+        定义：主线程不断的重复获取执行消息、在获取执行不断循环的机制
+        为何要事件循环：
+            JS 是单线程的
+            在处理异步操作的时候需要事件循环机制
+        相关概念：
+            堆（Heap）：大块非结构化内存区域，储存对象、数据
+            栈（Stack）：调用栈，储存该次村换待主程序执行的任务
+            队列（Queue）：事件队列，先进先出被推入调用栈中
+        宏任务（Macro Task） 和 微任务（Micro Task）
+        Node.js 事件循环
+
+    原型链
+        每一个函数都有一个原型 prototype 属性，这个属性指向函数的原型对象
+        每一个 new 出来的 对象 都有一个 _proto_ 属性，指向对象的原型
+        每个原型都有一个 constructor 属性指向该关联的构造函数，
+        当读取实例的属性时，如果找不到。就会查找与对象关联的原型中的属性。如果还查不到，就会去找原型的原型，一直找到最顶层为止
+        原型链的主要用途是，理解 js 中继承和代码复用的。ES6 的 class关键字 出来之前，JS 中只能用原型来进行对象的封装和继承。一切原型链有助于我们理解整个继承和调用的过程
+        概念：
+        1. prototype
+        2. __proto__
+        3. constructor
+        应用场景：
+            继承、代码复用
+        ES6 出来后 是否 需要理解原型链
+
+    异步编程
+        回调函数 CallBack
+            1. 通过传入 回调函数作为参数在函数中 异步执行
+            2. 优点：简单
+            3. 缺点：回调地狱
+        Promise
+            1. ES6 中出现的异步解决方案
+            2. 可以获取异步操作消息的对象
+            3. resolve / reject，then / catch
+            4. 优点：解决了回调地狱
+            5. 代码可读性不高
+        async / await
+            1. ES8 （ES2017）中出现的异步解决方案
+            2. 是基于 Promise 的语法糖，需要了解 promise 相关知识
+            3. async 返回 Promise 对象
+            4. async 函数遇到 await 时 会 终止运行，直到 相应的 Promise 状态 变为 resolved
+            5. 优点：解决了 promise 代码可读性问题，代码可读性高
+            6. 缺点：多个并行操作需要用 Promise.all 来执行
+        
+        ES5：回调地狱
+        ES6：Promise
+            const makeRequest = () => {
+                return callAPromise()
+                    .then( () => callAPromise() )
+                    .then( () => callAPromise() )
+                    .then( () => callAPromise() )
+                    .then( () => callAPromise() )
+                    .then( () => callAPromise() )
+            }
+            采用 链式调用的方式来串行执行异步函数，Promise 是一个可以获取异步操作信息的特殊对象。其中有 resolve+then 和 reject+catch，来分别处理 成功 和 失败 的回调
+        ES8：async / await（这个基于 Promise 的）
+            async function fetchData(){
+                const result1 = await callApi('https://example.com/endpoint1');
+                const result2 = await callApi('https://example.com/endpoint2');
+                // ... 
+            }
+            async 相当于一个 返回 Promise 的函数，await 可以在 async 函数中起 阻塞的作用，大幅提升代码的可读性。
+            还有个小缺点是，并行异步操作还是需要用 promise.all 来执行
+
+    浏览器储存
+        Cookies
+            主要用于 与 服务端 通信
+            储存量小
+            约 4KB / 可序列化 / 字符串类型 / 无序存储
+        Local Storage
+            储存量相较于 Cookies 更大
+            只能 存储 字符串
+            约 5MB / 可序列化 / 字符串类型 / 无序存储
+        Session Storage
+            只存在与当前 Session，关闭浏览器 数据就丢失了
+            其他 与 Local Storage 一样
+            约 5MB / 无序列化 / 字符串类型 / 无序存储
+        IndexedDB
+            相当于浏览器上的 Sql 数据库
+            更大的存储空间
+            API 较难掌握
+            约 硬盘一半 / 可序列化 / 任意型型 / 有序存储
+        
+    跨域
+        定义：客户端 与 不同源 的服务端 通信
+        解决办法：
+            CORS
+                跨域资源共享，解决跨域请求的方案的成熟方案
+            JSONP
+                基于 <script> 标签具有可跨域性
+                只能用于 Get 请求
+            iframe
+                通过 <iframe> 标签在一个页面展示不同源的页面
+                通过 PostMessage 进行页面之间的 通信
+            反向代理
+                通过反向代理让客户端与服务端保持同源
+
+    Webpack打包
+        目的：
+            将不同类型的源文件编译打包成静态文件
+        为什么使用 Webpack
+            前端技术纷繁复杂，缺乏统一管理
+            大型项目需要模块化
+            对于例如 JSX、TS、sass 等 之类 的新技术 需要编译后才能使用
+        编译器
+            Webpack 需要配置特定的编译器，通常采用 babel 作为 JavaScript 的编译器
+        插件
+        优化
+
+    Python调用JS的库
+        pyV8
+            V8 是 Google 的开源 JavaScript 引擎，被使用在了 Chrome 中。
+            PyV8 是 V8 引擎的一个python层包装，可以调用 V8 引擎 执行 JS 代码
+            有内存泄漏，不使用
+        Js2Py
+            是一个纯 python 实现的 JavaScript 解释器 和 翻译器。
+            高度混淆的大型 JS 会转换失败
+            转换出来的代码可读性差、性能不高
+            Bug多 不使用
+        PyExecJs
+            一个最开始诞生于 Ruby中的 库，后来被移植 到了 python 上
+            有多个引擎可选，但一般会选择 NodeJs 作为引擎执行代码
+            执行大型 js 时会很慢（因为每次执行 JS 代码 都是 从 命令行去调用到 JS，复杂的 JS 会初始化 时间变长）
+            特殊编码的输入或输出参数会出现报错的情况（可以把输入或输出的参数使用 base64 编码一下，再进行操作）
+        PyminiRacer
+            同样是 V8 引擎的包装，和 PyV8 效果一样
+            一个继任 PyExecJS 和 PyV8 的库
+            比较新，慎用
+        Selenium
+            一个 Web 自动化 测试框架，可以驱动各种浏览器进行模拟人工操作
+            用于渲染页面以方便提取数据 或 过 验证码
+            也可以 直接驱动 浏览器执行 JS
+        Pyppeteer
+            是 Puppeteer 的Python版本，第三方开发的，是一个 Web自动化测试框架
+            原生支持以协程的方式 调用，同时性能比 Selenium 高
+            对于用 Asyncio + Aiohttp 写爬虫的人而言 可以直接使用
+            是 nodejs的一个叫做 Puppeteer的 库 的 Python 移植版
+            Puppeteer 是 google官方开发库
+            Pu 开头的是 Nodejs版
+            Py 开头的是 Python 版
+            它是一个异步的库，所以 和 selenium 这种同步的库 会有所不同，需要配合 asyncio 来进行使用
+            如果是 使用 python中的 Aiohttp 库来写爬虫的话，就不需要像 selenium 那么麻烦，也不需要 增添 额外的 兼容 的一些代码，可以直接调用它
+            它也和 selenium 一样，可以驱动各种浏览器进行模拟人工操作，直接驱动 浏览器执行 JS
+
+            
+
+        PyExecJs 使用
+            1. 安装 JS 运行环境：这里推荐 安装 Node.js，安装方便，执行效率高
+            2. 安装 Pyexecjs : pip install pyexecjs
+            代码示例：
+                检测运行环境
+                    import execjs
+                    execjs.get().name #查看调用环境
+                    'Node.js(V8)'
+            手动设置不同的引擎进行解析
+                # 长期使用
+                os.environ["EXECJS_RUNTIME"]="Node"
+                # 临时使用
+                import execjs.runtime_names
+                node = execjs.get(execjs.runtime_names.Node)
+            调用示例：
+                1. 简单方式
+                    import execjs
+                    e = execjs.eval('a=new Array(1,2,3)') # 可以直接执行JS代码
+                2. 通用方式（编译后使用）
+                    import execjs
+                    jstext="function hello(str){return str;}"
+                    ctx=execjs.compile(jstext)    #编译js代码
+                    a = ctx.call("hello", "hello world")
+                    print(a)
+
+        Pyppeteer 使用
+            1. result = await page.evaluate(js, *data)
+            2. 如果想在 页面加载前调用 js 的话，可以用 以下 代码
+                result = await page.evalutateOnNewDocument(js, *data)
+                这个方法一般是用来初始化环境的，比如 可以用它来修改 浏览器的 navigator 属性，
+                在 调用像 生成浏览器指纹之类的时候，这个操作非常有用
+                这个不是指直接调用 JS 用的，而是指 自动化测试的过程中来 采集页面时的一个用法

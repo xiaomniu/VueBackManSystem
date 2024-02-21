@@ -1,6 +1,8 @@
 <template>
     <div class="like-page">
-        喜欢
+        <ArticleItem></ArticleItem>
+        <ArticleItem></ArticleItem>
+        <ArticleItem></ArticleItem>
     </div>
 </template>
 

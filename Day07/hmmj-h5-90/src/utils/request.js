@@ -1,4 +1,7 @@
 import axios from 'axios'
+import { Toast } from 'vant';
+import { delToken, getToken } from './storage';
+import router from '@/router';
 
 // 封装 request.js 步骤
 /**
@@ -26,6 +29,10 @@ const instance = axios.create({
   // 添加请求拦截器
   instance.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
+    const token = getToken();
+    if (token){
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   }, function (error) {
     // 对请求错误做些什么
@@ -40,6 +47,24 @@ instance.interceptors.response.use(function (response) {
   }, function (error) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
+    console.dir(error)
+    if (error.response){
+      if (error.response.status === 401){
+        // 所有的 401 都表示 token 有问题，只要 token 有问题 就需要做以下事情：
+        // 1. 清空 token
+        delToken();
+        // 2. 提示用户
+        Toast.fail('请您重新登录')
+        // 3. 跳转到登录页
+        router.push('/login')
+      } else {
+        console.log(error.response.data.message)
+        // 只有在组件内 才能 使用 this.$toast
+        // this.$toast.fail(error.response.data.message)
+        // 其他地方需要按需导入后 使用
+        Toast.fail(error.response.data.message)
+      }
+    }
     return Promise.reject(error);
   });
 

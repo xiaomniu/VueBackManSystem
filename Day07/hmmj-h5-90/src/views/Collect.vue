@@ -1,6 +1,8 @@
 <template>
     <div class="collect-page">
-        收藏页面
+        <ArticleItem></ArticleItem>
+        <ArticleItem></ArticleItem>
+        <ArticleItem></ArticleItem>
     </div>
 </template>
 

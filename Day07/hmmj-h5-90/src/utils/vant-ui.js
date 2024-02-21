@@ -23,3 +23,23 @@ import { Form } from 'vant';
 import { Field } from 'vant';
 Vue.use(Form);
 Vue.use(Field);
+
+import { Toast } from 'vant';
+Vue.use(Toast);
+
+import { Cell, CellGroup } from 'vant';
+Vue.use(Cell);
+Vue.use(CellGroup);
+
+import { List } from 'vant';
+Vue.use(List);
+
+import { PullRefresh } from 'vant';
+Vue.use(PullRefresh);
+
+import { Icon } from 'vant';
+Vue.use(Icon);
+
+import { Grid, GridItem } from 'vant';
+Vue.use(Grid);
+Vue.use(GridItem);

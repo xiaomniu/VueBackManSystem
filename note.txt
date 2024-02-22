@@ -178,7 +178,7 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
         样式：style（可支持less，需要装包）
             让组件支持less
                 1. style标签，lang="less" 开启less功能
-                2. 装包：npm i less less-loader@5 -D
+                2. 装包：npm i less less-loader@5 -D（本机使用的是：npm i less less-loader）
         行为：js逻辑
 
     普通组件 的 注册使用
@@ -1043,74 +1043,232 @@ https://apifox.com/apidoc/shared-24459455-ebb1-4fdc-8df8-0aff8dc317a8
                 ]
             })
 
-    HTTP协议 - 请求报文
-        HTTP协议：规定了浏览器发送及服务器返回内容的格式
-        请求报文：浏览器按照HTTP协议要求的  格式，发送给服务器的  内容
 
-        请求报文的组成部分：
-            1. 请求行：请求方法，URL，协议
-            2. 请求头：以键值对的格式携带的附加信息，比如：Content-type
-            3. 空  行：分隔请求头，空行之后的是发送给服务器的资源
-            4. 请求体：发送的资源
+************** Day09 **************
+    Vuex 概述
+        目标：vuex 是什么，应用场景，优势
+        1. 是什么
+            vuex 时一个vue 的 状态管理工具，状态就是数据
+            大白话：vuex 是一个插件（类似 router），可以帮我们管理 vue 通用的数据（多个组件间共享数据）
+        2. 应用场景
+            某个 状态 在 多个组件 中来使用（个人信息等）
+            多个组件 共同维护 一份数据（购物车等）
+        3. 优势
+            共同维护一份数据，数据集中化管理
+            响应式变化
+            操作简洁（vuex提供了一些辅助函数）
 
-            请求行   POST /h5/user/login HTTP/1.1
-            请求头   Accept: application/json, text/plain, */*
-            请求头   Accept-Encoding: gzip, deflate
-            请求头   Accept-Language: zh-CN,zh;q=0.9,zh-TW;q=0.8,en-US;q=0.7,en;q=0.6,ko;q=0.5
-            请求头   Cache-Control: no-cache
-            请求头   Content-Length: 45
-            请求头   Content-Type: application/json
-            请求头   Host: interview-api-t.itheima.net
-            请求头   Origin: http://localhost:8080
-            请求头   Pragma: no-cache
-            请求头   Proxy-Connection: keep-alive
-            请求头   Referer: http://localhost:8080/
-            请求头   User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
-            空  行
-            请求体   {username: "qwerqwer", password: "qwerqwer"}
+    构建 vuex[多个组件数据共享]环境
+        目标：基于脚手架创建项目，构建 vuex 多组件数据共享环境
+        vue全家桶：vue + vuecli + vuerouter + vuex + vue组件库（vant，elementUI）
+    
+    创建一个空仓库
+        目标：安装 vuex 插件，初始化一个空仓库
+        1. 安装 Vuex
+            npm i vuex@3
+            vue2 + vuerouter3 + vuex3
+            vue3 + vuerouter4 + vuex4
+        2. 新建 vuex 模块文件
+            新建 src/store/index.js 专门存放 vuex
+        3. 创建仓库
+            Vue.use(Vuex)，创建仓库 new Vuex.Store()
+        4. main.js 导入挂载
+            在 main.js 中导入挂载到 Vue 实例上
 
-    HTTP协议 - 响应报文
-        HTTP协议：规定了浏览器发送及服务器返回内容的格式
-        响应报文：服务器按照 HTTP 协议要求的 格式，返回给 浏览器 的 内容
+    Vuex 有 5个核心概念
+      1.state 状态
+        目标：明确如何给仓库提供数据，如何使用仓库的数据
+        1. 提供数据：
+            state 提供唯一的公共数据源，所有共享的数据都要统一放到 Store中的 State中存储。在 state 对象中可以添加我们要共享的数据
+            // 创建 Vuex 仓库
+            const store = new Vuex.Store({
+                // state 状态，即数据，类似于 vue 组件中的data
+                // 区别：1. data 是组件自己的数据； 2. state 是所有组件共享的数据
+                state: {
+                    count : 101
+                }
+            })
+        2. 使用数据：
+            通过 store 直接访问
+                获取 store：
+                (1) this.$store
+                (2) import 导入 store
+
+                模板中      ：{{ $store.state.xxx }}
+                组件逻辑中  ：this.$store.state.xxx
+                JS模块中    ：store.state.xxx
+
+            通过辅助函数（简化 写法）
+                // 把 state 中的数据，定义在 组件内 的 计算属性中
+                computed:{
+                    count(){
+                        return this.$store.state.count
+                    }
+                }
+
+                mapState 是辅助函数，帮助我们把 store 中的数据 自动 映射 到组件计算属性中
+                    1. 导入 mapState
+                        import { mapState } from  'vuex'
+                    2. 数组方式引入 state
+                        mapState(['count'])
+                    3. 展开运算符映射
+                        computed:{
+                            ...mapState(['count'])
+                        }
+      2.mutations对象
+        目标：掌握 mutations 的操作流程，来修改 state 中的数据。（state 数据 的 修改 只能通过 mutations）
+        问题：明确 vuex 同样遵循 单向数据流，组件中 不能直接修改仓库数据
+        通过 strict:true 可以开启严格模式（http://vuex.vuejs.org/zh/guide/strict.html）
+            开启严格模式后：如果在组件内直接修改 state中的数据 会报错，但 state 中的这个数据 值 还是可以修改
+        1. 定义 mutations 对象，对象中 存放 修改 state 的方法
+            const store = new Vuex.Store({
+                state: {
+                    count : 101,
+                },
+                // 定义 mutations
+                mutations:{
+                    // 第一个参数是 当前 store 的 state 属性
+                    // 第一个参数是 payload，提交载荷
+                    addCount(state, n){
+                        state.coumubnt += 1
+                    }
+                }
+            })
+        2. 组件中提交调用 mutations
+            this.$store.commit('addCount')
+            
+            调用流程
+                1. 用户点击 按钮 触发 click 事件
+                2. 在事件处理函数中，调用 commit 触发 mutations 函数执行
+                3. mutations 函数中，修改 state.count
+                4. 数据变化后，所有用到该 数据的 视图 都会更新
+
+        辅助函数 - mapMutations
+            目标：掌握辅助函数 mapMutations，映射方法
+            mapMutations 和 mapState 很像，他是把位于 mutations 中的方法提取了出来，映射到组件 methods 中
+            mutations: {
+                subCount (state, n) {
+                    state.count -= n
+                }
+            }
+
+            import { mapMutations } from 'vuex'
+            methods: {
+                ...mapMutations(['subCount'])
+            }
+            相当于
+            methods: {
+                subCount(n){
+                    this.$store.commit('subCount', n)
+                }
+            }
+
+      3.actions 对象
+        目标：明确 actions 的基本语法，处理异步操作
+        需求：三秒后 修改 state 的 count 为 666
+        说明：mutations 函数中 的代码 必须是 同步的（便于 检测数据变化，记录调试）。如果使用异步代码，将不能 及时 检测到 数据变化
         
-        响应报文的组成部分：
-            1. 响应行（状态行）：协议、HTTP响应状态码、状态信息
-            2. 响应头：以键值对的格式携带的附加信息，比如：Content-Type
-            3. 空行：  分隔响应头，空行之后的是服务器返回的资源
-            4. 响应体：返回的资源
+        辅助函数 - mapActions
+            目标：掌握 mapActions，映射方法
+            mapActions 是把 位于 actions 中 方法提取了出来，映射到组件 methods 中
 
-            响应行  HTTP/1.1 200 OK
-            响应头  Content-Length: 260
-            响应头  Access-Control-Allow-Credentials: true
-            响应头  Access-Control-Allow-Origin: http://localhost:8080
-            响应头  Connection: keep-alive
-            响应头  Content-Type: application/json; charset=utf-8
-            响应头  Date: Wed, 21 Feb 2024 11:04:09 GMT
-            响应头  Keep-Alive: timeout=4
-            响应头  Proxy-Connection: keep-alive
-            响应头  Referrer-Policy: no-referrer-when-downgrade
-            响应头  Server: nginx
-            响应头  Set-Cookie: acw_tc=2f624a4517085134491805791e798edfc3971acbcabae965864d1d45c68a06;path=/;HttpOnly;Max-Age=1800
-            响应头  Set-Cookie: locale=zh-cn; path=/; max-age=31557600; expires=Thu, 20 Feb 2025 17:04:09 GMT
-            响应头  Vary: Origin
-            响应头  X-Content-Type-Options: nosniff
-            响应头  X-Content-Type-Options: nosniff
-            响应头  X-Download-Options: noopen
-            响应头  X-Download-Options: noopen
-            响应头  X-Frame-Options: SAMEORIGIN
-            响应头  X-Permitted-Cross-Domain-Policies: none
-            响应头  X-Readtime: 129
-            响应头  X-Xss-Protection: 1; mode=block
-            空  行
-            响应体  {"code":10000,"message":"请求成功","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI0MTEiLCJpYXQiOjE3MDg1MTM0NDksImV4cCI6MTcwODc3MjY0OX0.3iMqWupuPYCgKeheWZXcNzquz2Wf60BBj3zYXPuLaRk","currentAuthority":"user","status":"ok","type":"account"}}
+            actions:{
+                changeCountAsync(context, num) {
+                    setTimeout(()=>{
+                        context.commit('changeCount', num)
+                    }, 2000)
+                }
+            }
 
-        Http响应状态码
-            HTTP响应状态码：用来表明请求是否成功完成
-            比如：404 （服务器找不到资源）
-            状态码      说明
-            1xx         信息
-            2xx         成功
-            3xx         重定向消息
-            4xx         客户端错误
-            5xx         服务器端错误
+            import { mapActions } from 'vuex'
+            methods:{
+                ...mapActions(['changeCountAsync']),
+            }
+            等同于
+            methods:{
+                changeCountAsync(n){
+                    this.$store.dispatch('changeCountAsync', n)
+                }
+            }
+
+      4.getters 对象
+        目标：掌握核心概念 getters 的基本语法（类似于 计算属性）
+        说明：除了 state 之外，有时我们还需要从 state 中派生出一些状态，这些状态是依赖 state 的，此时会用到 getters
+            例如：state 中 定义了 list，为 1~10 的数组，需要显示所有大于 5 的数据
+            state:{
+                list:[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }
+            1. 定义 getters
+            getters: {
+                // 注意：
+                // (1) getters函数的第一个参数是 state
+                // (2) getters函数必须是要有返回值的
+                filterList(state) {
+                    return state.list.filter(item => item > 5)
+                }
+            }
+            2. 访问 getters
+                1. 通过 store 访问 getters
+                {{ $store.getters.filterList}}
+                2. 通过 辅助函数 mapGetters 映射
+                computed:{
+                    ...mapGetters(['filterList'])
+                }
+                {{ this.filterList }}
+
+      5.module 分模块（进阶语法）
+        目标：掌握核心概念 module 模块的创建
+        由于 vuex 使用 单一状态树，应用到所有状态 会集中到一个较大的 对象。当应用变得非常复杂时，
+        store对象就会变得非常 臃肿，项目越大，vuex 越来越难以维护
+
+        模块拆分：
+            user模块：store/modules/user.js
+            const state = {
+                userInfo:{
+                    name: 'zs',
+                    age: 18
+                }
+            }
+            const mutations = {}
+            const actions = {}
+            const getters = {}
+            export default{
+                state,
+                mutations,
+                actions,
+                getters
+            }
+
+            注册模块：
+            import user from './modules/user'
+            const store = new Vuex.Store({
+                modules:{
+                    user
+                }
+            })
+        
+        目标：掌握模块中的 state 的访问语法
+        尽管已经分模块了，但其实子模块的状态，还是会挂到根级别的 state 中，属性名 就是 模块名
+        使用模块中的数据：
+            1. 直接通过模块名访问：$store.state.模块名.xxx
+            2. 通过 mapState 映射
+            默认根级别的映射 mapState(['xxx'])
+            子模块的映射 mapState('模块名', ['xxx']) - 需要 开启 命名空间
+
+        目标：掌握模块中 getters 的访问语法
+        使用模块中 getters 中的数据
+            1. 直接通过 模块名访问 $store.getters['模块名/xxx']
+            2. 通过 mapGetters 映射
+            默认 根级别 映射  mapGetters(['xxx'])
+            子模块 中 映射 mapGetters('模块名', ['xxx']) - 需要开启  命名空间
+
+        目标：掌握模块中 actions 的调用语法（同理 - 直接类比 mutation 即可）
+        注意：默认模块中的 mutation 和 acitons 会被挂载到 全局，需要开启命名空间，才会挂载 到 子模块中
+        调用 子模块 中 action：
+            1. 直接通过 store 调用 $store.dispatch('模块名/xxx', 额外参数)
+            2. 通过 mapActions 映射
+            默认 根级别 映射  mapActions(['xxx'])
+            子模块映射 mapActions('模块名', ['xxx']) - 需要开启 命名空间
+
+
 

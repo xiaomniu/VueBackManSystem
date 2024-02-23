@@ -239,7 +239,7 @@ composer 方式部署 laravel 项目
             则 调用有名字的 路由 可以写成：route('名字')
 
             查看系统已经 存在的 路由
-                命令：php artinsan route:list
+                命令：php artisan route:list
     
     5. 路由群组（理解）
         比如 后台 有 如下路由
@@ -512,21 +512,405 @@ composer 方式部署 laravel 项目
 *******************    Day02    ******************
 *+++++* 视图操作【重点】
 1. 视图写在哪里
+    位置：resources/views
+    可以进行分目录管理
+
 2. 视图文件的命名与渲染
+    (1) 文件名 习惯 小写
+    (2) 文件名的后缀是 .blade.php（因为 laravel 里有一套模板引擎 就是 使用 blade，可以直接使用标签语法 {{$title}}，也可以使用原生 php 语法显示数据
+    (3) 需要注意的是也可以使用 .php 结尾，但是这样的话就不能使用 laravel 提供的标签 {{$title}} 语法显示数据，只能用原生语法 <?php echo $title; ?> 显示数据
+    两个视图文件可以同时存在，则 .blade.php 后缀的优先显示出来
+    案例：
+        编写一路由地址，调用控制器的 test3() 方法，展示视图 test3文件（创建 2 个，一个 .blade.php 结尾，另一个 .php 结尾）
+        新增路由：
+            Route::get('/home/test/test3', 'TestController@test3');
+        展示 视图的方法：
+            return view('视图文件名称');
+            视图可以进行 分目录管理的，如 home/test/test3 视图，可以 写成
+                return view('home/test/test3');   或者 
+                return view('home.test.test3');
+
 3. 变量分配与展示
+    控制器 和 视图  要进行 数据 交互
+    语法：
+        1. view(模板文件名称, 数组)         // 这个 “数组”，就是我们需要 分配的变量 键值对 集合
+        2. view(模板文件名称)->with(数组)
+        3. view(模板文件名称)->with(名称, 值)->with(名称, 值)
+        使用 view() 方式 渲染 一个视图后，在 .blade.php 的视图文件中，模板中输出变量使用 “{{$变量}}”
+            $date = date('Y-m-d H:i:s', time());
+            $day = '星期二';
+            return view('home.test.test3', ['date'=>$date, 'day'=>$day]);
+        在视图 test3.blade.php 文件中 展示 传递的变量
+            现在是时间是:{{$date}}，今天是 {{$day}}
+
 4. 扩展：compact() 函数的使用（传参）
+    compact() 函数，是 php 内置函数 跟 laravel 框架没有关系。作用主要是用于打包数组的。
+    语法：compact('变量名1', '变量名2', '变量名3', ...)
+    改写上面的代码：
+        $date = date('Y-m-d H:i:s', time());
+        $day = '星期二';
+        return view('home.test.test3', compact('date', 'day'));
+
 5. 模板中直接使用函数
+    回顾：在 smarty 模板引擎中存在一个特殊的符号 “|”（管道），名称 称之为 变量修饰符。作用就是在 视图中 解释变量（使用函数去处理变量）
+    在 laravel 中，视图调用函数 其语法 基本 与 js、php 的语法一致，只不过要求 左右包含 大括号。
+    语法：{{ 函数名(参数1, 参数2, ...) }}
+    说明：函数名 可以是 php 内置的，也可以是 laravel 框架中定义的
+    案例：
+        在数据库中一般存储时间都是以时间戳 去储存的，但是在页面上展示的时候 不合适。就需要 对其格式化处理。
+        需要在 视图中 对其格式化 则怎么写？
+            一年后的时间是：{{ $time }} 格式化后：{{ date('Y-m-d H:i:s', $time)}}
+
+        如果需要使用更多的函数，则需要遵循函数的语法格式即可
+
 6. 循环与分支语法标签【重点】
-7. 模板 继承 / 包含
+    // 在视图里面遍历数据【重点】
+    在 laravel 中模板中 循环输出数据，则需要 遵循 语法：
+        // php写法
+        foreach ($varialbe as $key => $value){
+            // 循环体
+        }
+
+        // laravel 中 视图中 写法
+        @foreach ($varialbe as $key => $value)
+            // 循环体
+        @ endforeach
+    案例：
+        使用循环标签的语法，在视图中输出数据
+        新增路由：
+            Route::get('/home/test/test4', 'TestController@test4');
+        创建需要的方法，获取一些数据，传递给视图
+            // 循环标签
+            public function test4(){
+                // 查询数据
+                $data = DB::table('member')->get();
+                // 展示视图，传递数据
+                return view('home.test.test4', compact('data'));
+            }
+        创建 需要的 视图文件
+            home/test/test4.blade.php，文件中加入 以下 代码
+                @foreach ($data as $key => $value)
+                    {{$value->id}}&emsp;&emsp;{{$value->name}}&emsp;&emsp;{{$value->age}}&emsp;&emsp;{{$value->email}}<br>
+                @endforeach
+        在此过程中需要注意的就是 get 查询到的结果 集中每一条记录 其实都是一个对象。
+        因此在循环具体字段的时候需要注意使用 对象调用属性 的方式 才可以 获取其数据。
+
+    // 在视图里面可以执行 if 判断【重点】
+    if 语法在模板引擎中的写法：
+        // php 中写法
+        if (条件判断) { }
+        elseif (条件判断) { }
+        else { }
+
+        // laravel 中 视图中 写法
+        @if (条件判断) { }
+        @elseif (条件判断) { }
+        @else { }
+        @endif
+
+    案例：
+        要求在 php 代码中（控制器的方法）动态输出 今天的 星期几 的 数字（1~7），将数字传递给视图。显示出今天是 星期几。如果是 7
+        则在页面中输出 “星期天”【将数字转化成汉字】
+
+7. 模板 继承 / 包含  1.01.30
+    继承 不仅仅在 php 类中存在，在视图中同样存在。一般是用于做 有公共部分的页面
+    案例：
+        编写父级页面，再编写一个子页面（相当于php中的 2 个类）
+            编写父级页面：
+                语法： @yield('名字')       在父级页面中的占位
+        继承语法：
+            字模板中按以下语法书写：
+                @extends('需要继承的模板文件名')
+                如：
+                    @extends('home.test.parent')
+            通过 section 标签 绑定区块/部件 到父级页面，区块 名称 就是 父级页面 yield 标签的 参数名。
+                @section(区块名称)
+                代码
+                @endsection
+                如
+                    @section('mainbody')
+                    <div>
+                        科阿斯兰的放假啦空手道解放考虑按实际开来
+                    </div>
+                    @endsection
+
+    包含
+        语法：@include('模板文件名')                文件名不含后缀，语法类似 view 方法参数
+        如：
+            <h1>BBBB</h1>
+            @include('home.test.test4')
+            <h1>CCCC</h1>
+            @include('home.test.parent')
+            <h1>DDDD</h1>
+
 8. 外部静态 文件 引入方式（了解）
+    在写页面肯定会 引入相关的外部文件（js、css、image），则会设计到 路径的问题。
+    以下面这个 app.css 为例，看如何去引入 css 文件
+        以往的方式：
+            <link rel="stylesheet" type="text/css" href="/css/app.css">
+        laravel 视图文件中 的方式
+            <link rel="stylesheet" type="text/css" href="{{asset('css')}}/app.css">
+    Asset 方法中的参数可以是 多级目录 也可以是 单击目录。
+        <link rel="stylesheet" type="text/css" href="{{asset('css/abc/def')}}/app.css">
 
 *+++++* CSRF攻击
 1. 什么是 CSRF 攻击
+    CSRF 是 跨网站请求伪造（Cross-Site request forgery）的英文缩写
+    Laravel 框架中避免 CSRF 攻击，很简单：Laravel 自动为 每个用户 Session 生成了一个 CSRF Token。
+    该 Token 可用于验证登录用户 和 发起请求者是否是 同一个人，如果不是 则请求失败。【该原理和 验证码 原理一致】
+    Laravel 提供了一个全局帮助函数 csrf_token 来获取该 Token 值，
+    因此 只需要在视图提交表单中 添加 如下 HTML 代码，即可 在请求中 带上 Token：
+        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>
+                  
 2. laravel中 如何避免 CSRF 攻击
+    创建 路由 
+        // csrf 验证
+        Route::get('/home/test/test6', 'TestController@test6');
+        Route::post('/home/test/test7', 'TestController@test7');
+    创建 控制器 的方法
+    // 展示 基础的 表单
+        public function test6(){
+            // 
+            return view('home.test.test6', compact('data', 'day'));
+        }
+        // 处理请求
+        public function test7(){
+            return '请求提交成功';
+        }
+    创建需要的简易表单
+        <form action="{{route('test7')}}" method="post">
+            姓名：<input type="text" name="name" value="" placeholder="请输入姓名"><input type="submit" value="提交">
+        </from>
+
+    结论：通过刚才的案例，说明在 laravel 中 csrf 验证机制默认是开启的
+
+    解决 报错问题（如何通过 csrf 验证）
+        带上 csrf 需要的 token 值。随着 请求传递给 后续的方法
+        <input type="hidden" name="_token" value="{{csrf_token()}}">
+    
+    针对 csrf_token() 方法 的 简化：
+        {{ csrf_field()}}
+        等价于  “<input type="hidden" name="_token" value="{{csrf_token()}}">”
+    两者的区别
+        csrf_token 只是 输出 token 的值
+        csrf_field 输出了 一个 整个 input 隐藏域
+        当使用 异步提交表单的 方式 时：必须使用 csrf_token()
+            如：$.get(rul, {{_token}});
+        
 3. 从 CSRF 验证中 排除 例外路由
+    并不是 所有请求都需要 避免 CSRF 攻击，比如去 第三方 API 获取数据的 请求。
+    可以通过在 VerifyCsrfToken.php（app\Http\Middleware\VerifyCsrfToken.php）文件中，将要排除 请求 URL 添加到 $except 属性数组中。
+
+    如果 需要 排除 全部 路由 使用 csrf 的话，使用 “” 通配符，加入到 $except 属性数组中。
+        protected $except = [
+            // 这里 添加 需要 排除 csrf 验证的 路由
+            '*'
+        ];
 
 *+++++* 模型操作（AR模式）【理解】
+    Laravel 自带的 Eloquent ORM 提供了一个美观、简单的数据库打交道的 ActiveRecord 实现，每张数据表 都对应一个与该表进行交互的“model模型”，
+    模型 允许你 在表中进行数据查询，以及 插入、更新、删除 等操作
+    AR模式三个核心（映射）：
+        每个数据表              与数据进行交互的 model 模型映射（实例化模型）
+        记录中的字段            与模型类的属性映射（给属性赋值）
+        表中的每个记录          与一个完整的请求实例映射（具体的CURD操作）
+
 1. 定义模型
+    定义模型的位置：默认 在 app 目录下，建议使用  分目录管理
+    命名规则：
+        本身 laravel 对模型的命名没有严格的要求，一般采用 表名（首字母大写）.php 。比如：Member.php User.php Goods.php
+    创建模型
+        可以使用 artisan 命令
+        php artisan make:model Member
+    定义模型的注意事项：【重点】
+      （必做 protected）  第一：定义一个 $table 属性，值是不要前缀的表名，如果不指定则使用 类名的 复数形式作为 表名。
+                    如果 模型为 Member，模型在不指定 table 属性时，默认会去找 Members 表名。
+      （可选 protected）  第二：定义 $primaryKey 属性，值是 主键名称，如果需要使用 AR 模式的方法，则需要指定主键（Model::find(n)）
+                    在主键 字段 不是 id 的时候，则需要 指定 主键
+      （可选 public   ）  第三：定义 $timestamps 属性，值是 false，如果不设置为 false，则 默认会操作表中 created_at 和 update_at 字段。
+                    我们表中一般没有这 两个 字段，所以设置为 false，表示不要操作 这两个字段
+      （可选 protected）  第四：定义 $fillable 属性，表示使用 模型插入数据时，允许插入到数据库的字段信息。
+    注意：
+        使用模型中 create 插入数据时，要设置 $fillable 允许 入库的 字段。使用 $guarded 是设置 排除 入库的 字段
+            //定义 模型关联的数据表（一个模型 只操作  一个表）
+            protected $table = 'member';
+            //定义 主键（可选）
+            protected $primaryKey = 'id';
+            //定义 禁止操作 时间
+            public $timestamps = false;
+            //设置 允许写入的 数据字段
+            protected $fillable = ['id', 'name', 'age', 'email'];
+
 2. 模型控制器中调用
+    引入模型类：
+        use App\Home\Member;
+        模型的使用，在控制器中 的 使用方式 有 2 种：
+            1. 直接像 使用 DB门面 一样的操作方式：以调用静态方法为主的形式，该形式下模型不需要实例化
+                如：Member::get()    DB::table('member')->get()
+            2. 实例化模型然后 再去使用模型类（普通）
+                如：$model=new Member();  $model->get();
+
 3. 定义测试路由
+    // 模型的增删改查
+    Route::post('/home/test/test8', 'TestController@test8');
+    Route::get('/home/test/test9', 'TestController@test9');
+    Route::get('/home/test/test10', 'TestController@test10');
+    Route::get('/home/test/test11', 'TestController@test11');
+
+    Route::get('/home/test/test12', 'TestController@test12');
+
 4. 基本操作
+    1. 添加数据
+        在 laravel 里面完成数据的添加 可以使用 两种 方式：
+        方式一：（AR模式）：使用 AR 模式必须要实例化模型
+        注意：
+            在 Laravel 里面添加数据的时候，需要先实例化模型，然后为模型设置属性，最后调用 save 方法即可。
+            $member = new Member();         // 映射 关系 1：将表 映射到 模型
+            $member->name = value;          // 映射 关系 2：将字段映射到属性，属性名 和 字段名 一致
+            $member->save();                // 映射 关系 3：将记录映射到实例
+        如：
+            public function test8(){
+                // 实例化 模型，将 表 和 属性 映射 起来
+                $model = new Member();
+                // 给属性赋值，将字段 与 类的 属性 映射起来
+                $model -> name = '李逵';
+                $model -> age = '34';
+                $model -> email = 'likui@afs.com';
+                $res = $model -> save();
+                dd($res);
+            }
+        
+        上面的 这种方法可以完成 数据的插入，但是 不建议使用。
+
+        方式二：
+        先建立个建议的表单
+            <form action="/home/test/test8" method="post">
+                <p>姓名：<input type="text" name="name" value=""></p>
+                <p>年龄：<input type="text" name="age" value=""></p>
+                <p>邮箱：<input type="email" name="email" value=""></p>
+                {{ csrf_field() }}
+                <input type="submit" value="提交">
+            </from>
+        首先，在控制器文件引入 Request 这个类
+            use Illuminate\Http\Request;
+            Request 类使用：(与前面的 input 门面 类似，Input调用的是静态方法 获取路由地址上传的参数)
+                对象 传递
+                request 语法
+                $request->all()
+                $request->input('name')
+                $request->only(['name', 'id'])
+                $request->except(['name', 'gender'])
+                $request->has('name')
+                $request->get('name')
+            添加操作代码语法如下：
+                静态调用：Member::create($request->all()) //返回值 是一个对象
+                实例调用：$model->create($request->all()) //返回值 是一个对象
+        注意：
+            如果使用 create方法，则需要在模型中定义 fillable 属性，允许写入字段的定义，如果没有时间相关字段也需要禁用时间自动更新功能
+                // 禁用时间自动更新功能
+                public $timestamps = false;
+                // 使用 create方法，则需要在模型中定义 fillable 属性，允许写入字段的定义
+                protected $fillable = ['id', 'name', 'age', 'email'];
+        public function test8(Request $request){
+            // 实例化 模型，将 表 和 属性 映射 起来
+            $model = new Member();
+            $inputData = $request->all(); // 直接从 表单上 获取所有 输入信息，返回一个 数组
+            $res = $model->create($inputData);
+            dd($res);
+        }
+
+    2. 查询操作
+        获取指定主键的一条数据
+            $info = Member::find(4); // 静态方法调用，获取主键 为 4 的数据
+            public function test9(){
+                $data = Member::find(4);
+                dd($data->name);
+                dd($data);
+            }
+            其 结果集 默认是 一个对象
+            如果需要在 laravel中 对象的结果集 转化为数组，则需要在最终添加方法的调用：
+                ->get()->toArray();
+                例如：$data = Member::find(4);
+
+        获取符合指定条件的 第一 条数据
+            Member::where('id', '>', 4)->first()
+            如：
+            public function test9(){
+                // $data = Member::find(4);
+                // dd($data->name);
+                $data = Member::where('id', '>', 7)->first();
+                dd($data->toArray());
+            }
+        
+        查询多行　并且　指定字段
+            Member::all()
+            Member::all([字段1, 字段2])         // 与 get 方法的区别，all 不支持连接其他的辅助查询方法
+            相当于 get 方法
+            Member::get()
+            Member::get([字段1, 字段2])
+
+            按条件查询指定多个字段
+            Member::where('id', '>', 2)->get(['列1', '列2'])        // 数组选列
+            Member::where('id', '>', 2)->select('列1', '列2')->get()        // 字符串选列
+            Member::where('id', '>', 2)->select(['列1', '列2'])->get()        // 字符串选列
+            
+    3. 修改数据
+        注意：在 laravel 里面 如果需要更新数据（ORM模型方式），需要先调用模型的 find 方法 获取对应的记录，返回一
+        个模型对象，然后为该模型对象 设置要更新的数据（对象属性），最后调用 save() 方法即可。
+        例如：
+            $user = User::find($id);
+            $user->title = $_POST['title'];
+            $user->content = $_POST['content'];
+            return $user->save() ? 'OK' : 'Faild';
+        案例：
+            实现 ORM形式 模型的修改操作。修改 id=6 的用户的 邮箱为：ssss@aaa
+                public function test10(){
+                    // ar模式的修改操作
+                    $data = Member::find(6);
+                    //赋值属性（需要修改的字段进行赋值）
+                    $data->email = 'sssss@aaa';
+                    $res = $data->save();
+                    dd($res);
+                }
+
+        问题：能不能用模型 去 update 呢？
+        答：可以使用 update 方法进行更新，也可以使用 AR 模式的方式 进行 更细。
+            public function test10(){
+                //使用 DB里面的 update 方法进行更新
+                $res = Member::where('id','6')->update([
+                    'name' => 'xixixi',
+                    'age'  => '33'
+                ]);
+                dd($res);
+            }
+
+    3. 删除数据
+        注意：在 laravel 里面 如果需要 删除 数据（ORM模型方式），需要先调用模型的 find 方法 获取对应的记录，返回一
+        个模型对象，最后调用 delete() 方法即可。
+        例如代码：
+            $user = User::find($id);
+            return $user->delete() ? 'OK' : 'Faild';
+        案例：
+            删除 id=6 的 记录
+                public function test11(){
+                    // ar模式的修改操作
+                    $data = Member::find(6);
+                    dd($data->delete());
+                }
+                // 返回值 bool
+        
+        问题：DB里面的删除 方式 能否 在 模型中 使用？
+            public function test11(){
+                //使用 DB里面的 delete 方法进行更新
+                dd(Member::where('id', '>', 2)->where('id', '<', 5)->delete());
+            }
+            // 返回值 影响的行数
+
+*+++++* 自动验证【重点】
+1. 准备工作
+2. 验证方式 一（控制器方式验证：推荐）
+    2.1 基本语法
+    2.2 基本验证规则
+    2.3 输出错误信息
+    2.4 内容案例
+    2.5 把输出效果转换成中文

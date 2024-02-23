@@ -4,10 +4,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 // use Illuminate\Support\Facades\Input;
 use Input;
+
 //引入 DB 门面
 use DB;
+
+//引入自定义模型
+use App\Home\Member;
 
 class TestController extends Controller {
     // 测试控制器 路由的 使用
@@ -98,12 +103,118 @@ class TestController extends Controller {
         dd($data);
     }
 
-    
     public function del(){
         // 指定需要操作的数据表实例
         $db = DB::table('member');
         // $rst = $db->where('id', '>', '10')->delete();
         $rst = DB::table('member')->truncate();
         dd($rst);
+    }
+    
+    public function test3(){
+        // 展示视图
+        // return view('home/test/test3');
+
+        // 现在的时间
+        $date = date('Y-m-d H:i:s', time());
+        $day = '星期二';
+        $time = strtotime('-1 year');
+        // $time = strtotime('+1 month');
+        // $time = strtotime('+1 week');
+        // $time = strtotime('+1 day');
+
+        // return view('home.test.test3', ['date'=>$date, 'day'=>$day]);
+        // dd(compact('date', 'day'));
+        return view('home.test.test3', compact('date', 'day', 'time'));
+    }
+    
+    // 循环标签
+    public function test4(){
+        // 查询数据
+        $data = DB::table('member')->get();
+        // 获取今天的星期数字
+        $day = date('N');
+        // 展示视图，传递数据
+        return view('home.test.test4', compact('data', 'day'));
+    }
+    
+    // 模板的继承
+    public function test5(){
+        // 查询数据
+        $data = DB::table('member')->get();
+        // 获取今天的星期数字
+        $day = date('N');
+
+        return view('home.test.test5', compact('data', 'day'));
+    }
+    
+    // 展示 基础的 表单
+    public function test6(){
+        // 
+        return view('home.test.test6');
+    }
+    
+    // 处理请求
+    public function test7(){
+        return '请求提交成功';
+    }
+
+    // 模型添加数据
+    public function test8(Request $request){
+        // 实例化 模型，将 表 和 属性 映射 起来
+        $model = new Member();
+        // dd($model);
+        //方式一
+        // // 给属性赋值，将字段 与 类的 属性 映射起来
+        // $model -> name = '李逵';
+        // $model -> age = '34';
+        // $model -> email = 'likui@afs.com';
+        // $res = $model -> save();
+        
+        //方式二
+        $inputData = $request->all(); // 直接从 表单上 获取所有 输入信息，返回一个 数组
+        // $inputData = array:4 [▼
+        // "name" => "hblj001"
+        // "age" => "56"
+        // "email" => "oijlhljk@sss"
+        // "_token" => "gjTZGrEbq8irCygGWaPLhT3TUD7DFSZUKbc5YJiK"
+        // ]
+        // dd($inputData);
+        $res = $model->create($inputData);
+        dd($res);
+    }
+    //模型查询数据
+    public function test9(){
+        // $data = Member::find(4);
+        // dd($data->name);
+        $data = Member::where('id', '>', 7)->first();
+        dd($data->toArray());
+    }
+    public function test10(){
+        // // ar模式的修改操作
+        // $data = Member::find(6);
+        // //赋值属性（需要修改的字段进行赋值）
+        // $data->email = 'sssss@aaa';
+        // $res = $data->save();
+        // dd($res);
+
+        //使用 DB里面的 update 方法进行更新
+        $res = Member::where('id','6')->update([
+            'name' => 'xixixi',
+            'age'  => '33'
+        ]);
+        dd($res);
+    }
+    public function test11(){
+        // // ar模式的修改操作
+        // $data = Member::find(6);
+        // dd($data->delete());
+        
+        //使用 DB里面的 delete 方法进行更新
+        dd(Member::where('id', '>', 2)->where('id', '<', 5)->delete());
+    }
+    
+    public function test12(){
+        return view('home.test.test12');
     }
 }

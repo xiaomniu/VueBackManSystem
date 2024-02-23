@@ -19,6 +19,8 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        // 这里 添加 需要 排除 csrf 验证的 路由
+        'home/test/test7',
+        '*'
     ];
 }

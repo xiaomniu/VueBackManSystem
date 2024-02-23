@@ -3,5 +3,7 @@ node_modules
 /dist
 
 .vscode/launch.json
-Day01/
+Day01/myproject01
+Day01/myproject02
+Day01/myproject03
 

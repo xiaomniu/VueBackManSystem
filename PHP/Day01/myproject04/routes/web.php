@@ -64,3 +64,16 @@ Route::get('/home/test/test10', 'TestController@test10');
 Route::get('/home/test/test11', 'TestController@test11');
 
 Route::get('/home/test/test12', 'TestController@test12');
+
+// 自动验证（二合一：即展示视图，又做数据处理，自己提交给自己
+Route::any('/home/test/test13', 'TestController@test13');
+
+// 文件上传
+Route::any('/home/test/test14', 'TestController@test14');
+
+// 数据分页（异步分页，即 Ajax 分页，可能 再次 发生请求，需要 使用  post）
+Route::get('/home/test/test15', 'TestController@test15');
+
+//响应方式
+Route::get('/home/test/test16', 'TestController@test16');
+Route::get('/home/test/test17', 'TestController@test17');

@@ -217,4 +217,88 @@ class TestController extends Controller {
     public function test12(){
         return view('home.test.test12');
     }
+    
+    //自动验证
+    public function test13(Request $request){
+        // 判断请求类型
+        // echo Input::method();
+        if (Input::method() == 'POST'){
+            // 自动验证
+            $this->validate($request,[
+                // 具体的规则
+                // 字段 => 验证规则1|验证规则2|验证规则3|...
+                'name'      => 'required|min:2|max:20',
+                'age'       => 'required|integer|min:1',
+                'email'     => 'required|email',
+                'captcha'   => 'required|captcha'
+            ]);
+            echo '输入的信息 没有问题';
+        }else{
+            // 展示视图
+            return view('home.test.test13');
+        }
+    }
+
+    //文件上传
+    public function test14(Request $request){
+        // 判断请求类型
+        if (Input::method() === 'POST'){
+            // 获取 传送过来的 文件信息 使用 $_FILES
+            // dd($_FILES);
+            
+            // dd($request->file('avatar'));
+            if ($request -> hasFile('avatar') && $request -> file('avatar') -> isValid() ) {
+                // 获取 文件的 原始 名称
+                // dd($request->file('avatar')->getClientOriginalName());
+                // 获取文件的 大小 单位 Byte
+                // dd($request->file('avatar')->getClientSize());
+                $houZhui = $request->file('avatar')->getClientOriginalExtension();
+                $filePath = md5(time() . rand(100000, 99999)) . '.' . $houZhui;
+                $request->file('avatar')->move('./uploads',  $filePath);
+
+                // 获取全部的数据
+                $data = $request->all();
+                // dd($data);
+                // 此时 $data 里的 avatar 属性中的 值 是一个 Illuminate\Http\UploadedFile 对象
+                $data['avatar'] = './uploads/' . $filePath;  // 这里 将  $data 里的 avatar 属性 的值 重新赋值 为 文件名 字符串
+                // dd($data);
+                $res = Member::create($data);
+                // dd($res);
+                if ($res == true) {
+                    return redirect('/');
+                }
+            }
+        }else{
+            // 展示视图
+            return view('home.test.test14');
+        }
+    }
+    
+    // 数据分页
+    public function test15(Request $request) {
+        // 查询所有数据
+        // $data = Member::get();
+        // 查询 分页数据
+        $data = Member::paginate(2);
+        // 展示视图 并传递数据
+        return view('home.test.test15', compact('data'));
+    }
+    
+    // ajax 页面展示
+    public function test16(Request $request) {
+        return view('home.test.test16');
+    }
+    // ajax 的响应
+    public function test17(Request $request) {
+        // 查询 数据
+        $data = Member::all();
+        // json格式 响应
+        // return json_encode($data);
+        // return response()->json($data);
+        // return '{ "aa": "hello test17"}';
+        // return "{ 'aa': 'hello test17'}";    // 不能响应
+        // return true;                         // 不能响应
+        // return 'hello test1111777';          // 不能响应
+        // return ['hell'];
+    }
 }

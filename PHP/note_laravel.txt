@@ -29,6 +29,8 @@ composer 方式部署 laravel 项目
         指定版本方式：
         composer create-project laravel/laravel=5.4.* ./myprojectname --prefer-dist
         composer create-project laravel/laravel=5.4.* --prefer-dist ./myproject02
+
+        composer create-project --prefer-dist laravel/laravel ./myproject04 "5.8.*"
         composer create-project laravel/laravel=5.8.* --prefer-dist ./myproject04
 
         更新 composer 程序
@@ -56,6 +58,8 @@ composer 方式部署 laravel 项目
         项目的入口文件和系统的静态资源目录（css,img,js,uploads）
         后期使用的外部静态文件（js、css、图片等）都需要放到 public 目录下
         注意：当然重点的是项目单一入口文件 也在 这个目录下。因此后续配置虚拟主机的时候需要将站点位置指定到 public 下
+        public/robots.txt
+            控制 某些网站 不允许 搜索引擎 抓包（爬数据）
     6. resources 目录，存放视图文件，还有就是语言包文件的目录
         lang 目录：语言包目录（如果项目需要本地化 则需要配置语言包）
         views 目录：视图文件存储目录（视图文件也可以分目录管理）
@@ -907,10 +911,655 @@ composer 方式部署 laravel 项目
             // 返回值 影响的行数
 
 *+++++* 自动验证【重点】
+    一般一个框架都会提供自动验证的机制。在 TP 里面的验证的规则是 写在模型里面进行验证的，但是自 laravel 里面的思想有些不一样。
+    他的验证规则可以写在控制器里面，也可以单独写一个专门的验证文件。
+    并且 laravel 里面的验证不通过情况下的 提示信息 和 表单数据 是保存在 session 里面的。
+    并且验证不通过的情况下 会跳转 到 上一个页面。
+    在前端页面中可以通过 JavaScript 验证表单的数据有效性。但是如果用户的浏览器版本过低 或者 禁用了 JavaScript，
+    则前端验证则可能失效，这样就不能保证数据的有效性。所以后端也需要做响应的验证操作，
+    这个操作在 laravel 中称之为 自动验证【在ThinkPHP 中也有 自动验证】
+
 1. 准备工作
+    1. 可以使用表单的页面（视图），此处新建视图 test13.blade.php 模板文件
+        创建需要的 路由 和 方法：
+            // 自动验证（二合一：即展示视图，又做数据处理，自己提交给自己
+            Route::any('/home/test/test13', 'TestController@test13');
+            //自动验证
+            public function test13(){
+                return view('home.test.test13');
+            }
+
 2. 验证方式 一（控制器方式验证：推荐）
+    建议 查看手册：HTTP层--验证 章节 
+        （https://docs.golaravel.com/docs/5.3/validation）
+        （https://learnku.com/docs/laravel/5.8/validation/3899）
     2.1 基本语法
+        使用 控制器中的 validate 方法来完成，
+            $this->validate($request, [验证规则]);
+        如果验证失败，laravel 会自动将用户重定向 回 上一个位置，并将验证错误信息 一次性 存放到 session 中
+        请求验证：
+            Laravel 提供了多种不同的处理方法来对应用程序传入的数据进行验证。
+            默认情况下，Laravel 的基底控制器类使用了 ValidatesRequests trait，
+            其提供了一种便利的方法来使用各种强大的验证规则验证传入的 HTTP 请求。
+                public function store(Request $request) {
+                    $this->validate($request, [
+                        'title' => 'required|unique:posts|max:255',
+                        'body' => 'required',
+                    ]);
+                    // The blog post is valid, store in database...
+                }
+        扩展补充：
+            如何 得知 一个请求类型？
+            语法：Input::method()           返回值： 'GET' 或 'POST'
     2.2 基本验证规则
+        required: 不能为空
+        max:255 最长255个字符
+        min:1 最少1个字符
+        email: 验证邮箱是否合法
+        confirmed: 验证两个字段是否相同，如果验证的字段是 password，则必须输入一个预支匹配的 password_confirmation 字段
+        integer: 验证字段必须是整形
+        ip: 验证字段必须是 IP 地址
+        max:value 验证字段必须小于等于 给定值value值，和字符串，数值，文件字段的 size 规则一样使用
+        min:value 验证字段必须大于等于 给定值value值，和字符串，数值，文件字段的 size 规则一样使用
+        size:value 验证字段必须有和给定值 value 想匹配的尺寸，
+            对字符串而言，value 是相应的 字符数目，
+            对数值而言，value 是给定的 整型值，
+            对文件而言，value 是相应的文件 字节数
+        string: 验证字段必须是 字符串
+        alpha：字段必须是 字母
+        numeric: 验证字段必须是数值
+        unique: table,column,except,idColumn
+        注意：
+            多个 验证规则 可以通过 “|” 字符进行隔开
+        代码案例：
+            //自动验证
+            public function test13(Request $request){
+                // 判断请求类型
+                // echo Input::method();
+                if (Input::method() == 'POST'){
+                    // 自动验证
+                    $this->validate($request,[
+                        // 具体的规则
+                        // 字段 => 验证规则1|验证规则2|验证规则3|...
+                        'name'      => 'required|min:2|max:20',
+                        'age'       => 'required|integer|min:1',
+                        'email'     => 'required|email'
+                    ]);
+                    echo '输入的信息 没有问题';
+                }else{
+                    // 展示视图
+                    return view('home.test.test13');
+                }
+            }
+
     2.3 输出错误信息
+        如果本次请求的参数未通过我们指定的验证规则呢？正如前面所提到的，Laravel 会自动把用户重定向到先前的位置。
+        另外，所有的验证错误会被自动 闪存至 session。
+        再者，请注意在 GET 路由中，我们无需显式的将错误信息和视图绑定起来。这是因为 Lavarel 会检查在 session 数据中的错误信息，然
+        后如果对应的视图存在的话，自动将它们绑定起来。
+        变量 $errors 会成为 Illuminate\Support\MessageBag 的一个实例对象。要获取关于这个对象的更多信息
+        注意：
+            $errors 变量被 Illuminate\View\Middleware\ShareErrorsFromSession 中间件绑定到视图，
+            该中间件由 web 中间件组提供。当这个中间件被应用后，在你的视图中就可以获取到 $error 变量，
+            使得你方便的假设 $errors 变量总是已经被定义好并且可以安全的使用
+        例子中，当验证失败的时候，用户将会被重定向到 create 方法，让我们在视图中显示错误信息：
+            <!-- /resources/views/post/create.blade.php -->
+            <h1>创建文章</h1>
+            @if (count($errors) > 0)
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <!-- 创建文章的表单 -->
+
     2.4 内容案例
+        定义验证规则：
+        输出错误信息：
+        实际演示效果：
+        到目前位置，验证的效果以及提示信息已经展示在页面上了，接下来将 显示信息 优化为 中文提示
+
     2.5 把输出效果转换成中文
+        由于中文和英文都是语言范畴，如果要切换提示文字，则需要有中文语言包的支持。目前框架只有 en 语言包，
+        下载其他语言包 在 以下网址有下载
+        网址：https://packagist.org     composer 主要的代码托管网站
+        在官网 搜索 laravel-lang
+        注意：
+            后期下载软件依赖的时候，选 下载量最好  和 收藏量最高 的包下载
+
+            Laravel 5.8	        composer require caouecs/laravel-lang:~4.0
+            Laravel 5.1-5.7	    composer require caouecs/laravel-lang:~3.0
+
+        语言包下载好后，文件存储在 vendor/caouecs/laravel-lang 中
+            vendor/caouecs/laravel-lang/auth.php
+            vendor/caouecs/laravel-lang/pagination.php
+            vendor/caouecs/laravel-lang/passwords.php
+            vendor/caouecs/laravel-lang/validation.php
+
+        接着将 需要的 中文语言目录 zh-CN 复制到 resources/lang 目录下即可
+        修改配置文件 config/app.php 中的 'locale' => 'en' 修改为  'locale' => 'zh-CN'
+        注意：
+            并不是 所有的字段都有对应的 翻译（或者翻译不准确），如果想自己定义翻译，则需要，手动修改 语言包文件代码
+            有关 自动验证 的 在 “vendor/caouecs/laravel-lang/validation.php” 文件中
+
+
+*******************    Day03    ******************
+*+++++* 文件上传
+    在 laravel 里面实现文件的上传时很简单的，压根不用引入第三方的类库
+    作者把 上传 作为一件 简单 的 http 请求看待的。使用时可以参考收藏
+    1. 修改表结构，添加一个字段
+        alter table member add column avatar varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER email;
+    2. 创建 添加数据的表单 和 路由
+        // 文件上传
+        Route::any('/home/test/test14', 'TestController@test14');
+        
+        //文件上传
+        public function test14(Request $request){
+            // 判断请求类型
+            if (Input::method() === 'POST'){
+                // 获取 传送过来的 文件信息 使用 $_FILES
+                // dd($_FILES);
+                // dd($request->file('avatar')); // $request->file('avatar') 返回的是  Illuminate\Http\UploadedFile 对象
+                if ($request -> hasFile('avatar') && $request -> file('avatar') -> isValid() ) {
+                    // 获取 文件的 原始 名称
+                    // dd($request->file('avatar')->getClientOriginalName());
+                    // 获取文件的 大小 单位 Byte
+                    // dd($request->file('avatar')->getClientSize());
+                    $houZhui = $request->file('avatar')->getClientOriginalExtension();
+                    $filePath = md5(time() . rand(100000, 99999)) . '.' . $houZhui;
+                    $request->file('avatar')->move('./uploads',  $filePath);
+
+                    // 获取全部的数据
+                    $data = $request->all();
+                    // dd($data);
+                    // 此时 $data 里的 avatar 属性中的 值 是一个 Illuminate\Http\UploadedFile 对象
+                    $data['avatar'] = './uploads' . $filePath;  // 这里 将  $data 里的 avatar 属性 的值 重新赋值 为 文件名 字符串
+                    // dd($data);
+                    $res = Member::create($data);
+                    dd($res);
+                }
+            }else{
+                // 展示视图
+                return view('home.test.test14');
+            }
+        }
+        回顾：
+            要想表单能够上传（此处不考虑异步方式），则表单应该具备哪些要求？
+        答：
+            1. 具有 from 标签，method 必须为 post，必须具备 enctype 属性
+            2. 至少 有一个 input 类型 为 file 的标签
+            3. 的具备一个提交按钮
+
+    3. 在控制器中，添加上传业务处理逻辑
+        【此操作建议查看手册】 地址：https://learnku.com/docs/laravel/5.3/requests/1164#files
+        关于 上传错误状态码 error 的取值：0 ~ 7 （没有 5，0 表示成功，其它的 都有问题）
+        思路：
+            1. 先去判断文件是否 正常 和 存在
+            2. 获取相关的信息（可选）
+            3. 保存文件（其实就是 移动文件 到 新的 目录）
+
+    4. 创建上传文件的保存路径
+        在 public 目录下 新建 目录：/public/uploads
+        关于项目中 使用路径的说明：
+            如果 路径 是给 php 代码 使用的，则路径 建议使用 “./” 形式
+            如果 路径 是给 浏览器 使用的，则建议使用 “/” 形式
+
+    5. 注意：
+        如果使用的时 create 方法添加数据到数据表中，则这里还需要修改以下 模型 里面的 一个 fillable 属性，代码允许插入到数据库的 字段
+
+    6. 将数据写入 数据库中
+        // 获取全部的数据
+        $data = $request->all();
+        // dd($data);
+        // 此时 $data 里的 avatar 属性中的 值 是一个 Illuminate\Http\UploadedFile 对象
+        $data['avatar'] = './uploads' . $filePath;  // 这里 将  $data 里的 avatar 属性 的值 重新赋值 为 文件名 字符串
+        // dd($data);
+        $res = Member::create($data);
+        dd($res);
+    
+    7. 如果上传 出现了 错误，一定要 获取错误 信息的方法：
+        $request->file('avatar') ->getErrorMessage(); // 返回 丰富的 上传数据的 错误信息
+
+*+++++* 数据分页
+    在 laravel 里面 要完成 分页 是 很简单的。它的思想 之前的框架 有些不一样，之前框架 使用 的是 分页类 完成 分页，laravel 是直
+    接调用 模型的 分页方法。返回 对应 的数据 和 分页 的字符串。
+    分页类的 在框架中的位置（了解）
+        vendor\laravel\framework\src\Illuminate\Pagination\Paginator.php
+    案例：
+        使用 分页功能 实现当前 member 数据表的 分页效果。
+        由于 数据量较少，可以考虑每页显示 一条记录，重点是 分页的效果
+
+    回忆：
+        分页效果的实现大致需要哪些步骤？
+        1. 查询 符合 分页条件 的 总的 记录数
+        2. 计算总的 页数（总记录数 / 每页记录数，并向上取整）
+        3. 拼凑分页的连接
+        4. （核心）使用 limit 语法来限制 分页的记录数
+        5. 展示分页的页码和分页数据
+        6. 考虑分页的样式 显示问题
+
+    1. 创建路由，并且展示建议列表页面(table 标签 布局) 
+        // 数据分页（异步分页，即 Ajax 分页，可能 再次 发生请求，需要 使用  post）
+        Route::get('/home/test/test15', 'TestController@test15');
+
+    2. 编写控制器中的方法代码，实现没有分页的效果（先不考虑分页效果）
+        // 数据分页
+        public function test15(Request $request) {
+            // 查询所有数据
+            $data = Member::get();
+            // 展示视图 并传递数据
+            return view('home.test.test15', compact('data'));
+        }
+
+    3. 展示数据
+        后期 涉及 到 路径 需要注意 点 “.” ：就是 路径的 点 的问题
+            @foreach ($data as $item)
+                <tr>
+                    <td>{{ $item->id }}</td>
+                    <td>{{ $item->name }}</td>
+                    <td>{{ $item->age }}</td>
+                    <td>{{ $item->email }}</td>
+                    {{-- <td>{{ $item->avatar }}</td> --}}
+                    <td><img src="{{ ltrim($item->avatar, '.') }}" width="80px" alt=""></td>
+                </tr>
+            @endforeach
+
+        记忆：
+            如果这个路径是给 php 代码使用，则一定使用 “./” 形式
+            如果 给 html（前端） 使用，则一定使用 “/” 形式
+            但是在 数据表中（存储的过程）使用哪种形式也就无所谓了
+
+    4. 案例：
+        使用 分页展示 上述 页面（要求：每页显示一条 记录）
+        在 laravel 中 分页 有 2 个 提供者：DB 查询构建器，另一个 使用  模型 来实现（用法基本一致）
+        1. 以 模型 为例：
+            文档地址：https://learnku.com/docs/laravel/5.3/pagination/1188
+
+            基于 Eloquent 模型分页
+            你可能需要对 Eloquent 分页。在这个例子中，我们将把 User 模型进行分页并且设置其每页有 15 条数据，如你所见，语法跟查询语句构造器的分页语法几乎一样：
+
+            $users = App\User::paginate(15);
+            当然，你可以在设置一些约束后再使用 paginate 分页，我们使用 where 举例：
+
+            $users = User::where('votes', '>', 100)->paginate(15);
+            或者也可以在使用 Eloquent 模型进行分页时使用 simplePaginate 方法：
+
+            $users = User::where('votes', '>', 100)->simplePaginate(15);
+
+            分页的基本语法：
+                Model::paginate(每页显示的记录数) 同样，paginate 和 get 一样，支持使用 where 以及 orderBy 等辅助查询的方法。
+            
+            在页面中 展示 分页 链接
+                显示分页结果
+                当你调用查询构建器或 Eloquent 查询上的 simplePaginate 或 paginate 方法时，你将会获取一个分页实例，当调
+                用 paginate 方法时，你将获取 Illuminate\Pagination\LengthAwarePaginator ，而调用方
+                法 simplePaginate 方法时，将会获取 Illuminate\Pagination\Paginator 实例。这些对象提供相关方法描述这些结果集，
+                除了这些帮助函数外，分页器实例本身就是迭代器，可以像数组一样对其进行循环调用。总之，一旦你获取到结果，
+                就可以对结果进行显示，并使用 Blade 渲染页面的链接：
+
+                <div class="container">
+                    @foreach ($users as $user)
+                        {{ $user->name }}
+                    @endforeach
+                </div>
+                {{ $users->links() }}
+
+                links 方法将给予查找结果中其它页面的链接。每一个链接中都已经包含正确的 ?page 查找字符串变量。请记住，由 links 方法
+                生成的 HTML 兼容于 Bootstrap CSS 框架。
+                语法：
+                    {{ $保存数据的对象 -> links() }} 生成的链接，显示分页页码
+
+            将 上下 页面跳转提示 改为 中文文字“上一页”，“下一页”。则 需要修
+            改 源文件 “vendor\laravel\framework\src\Illuminate\Pagination\resources\views\default.blade.php” 中的
+                &lsaquo; 值 修改为  上一页 或 下一页
+            
+            可以使用 simplePaginate() 进行简单的分页，只有 上一页 和 下一页，没有 中间的分页字符串
+            #info = Member::orderBy('age', 'desc')->simplePaginate(2);
+                分页数据对象的其他使用方法：
+                    Member::paginate(2)->count();                   // 当前 页 数据条数
+                    Member::paginate(2)->current();                 // 当前 页码
+                    Member::paginate(2)->firstItem();               // 当前 页 第一条数据 的序号
+                    Member::paginate(2)->hasMorePages();            // 是否 有后续页码
+                    Member::paginate(2)->lastItem();                // 当前页 最后一条数据 的序号
+                    Member::paginate(2)->lastPage();                // 最后页 序号
+                    Member::paginate(2)->nextPageUrl();             // 下一页 的 链接 地址
+                    Member::paginate(2)->perPage();                 // 每页 显示 数据 条数
+                    Member::paginate(2)->previousPageUrl();         // 上一页 的 链接 地址
+                    Member::paginate(2)->total();                   // 记录总条数
+                    Member::paginate(2)->url(5);                    // 制作 指定 页码数 的 链接地址
+
+            在 百度上 搜索 现成 的 分页导航 按钮 样式
+
+*+++++* 验证码
+    回顾：生成 验证码 需要 经过：画画布、生成干扰线、生成噪点、生成验证码、生成验证码存入 session、输出图片。
+1. 验证码依赖 安装
+    https://packagist.org 中搜索 captcha
+        https://packagist.org/packages/mews/captcha
+        命令：composer require mews/captcha
+        环境要求：
+            在 Windows 中，您需要在 php.ini 中包含 GD2 DLL php_gd2.dll。 并且您还需要包含 php_fileinfo.dll 和 php_mbstring.dll 以满足 mews/captcha 依赖项的要求。
+        用法：
+            1. 在引导 Laravel 应用程序时注册该提供程序
+                找到 providers 键 在 config/app.php 并注册验证码服务提供商。
+                    'providers' => [
+                        // ... 
+                        Mews \ Captcha \ CaptchaServiceProvider ::class,
+                    ]
+                找到aliases里面的键 在 config/app.php。
+                    'aliases' => [
+                        // ... 
+                        'Captcha' => Mews \ Captcha \ Facades \ Captcha ::class,
+                    ]
+            2. 自定义设置：
+                要使用您自己的设置，请发布配置。
+                    $ php artisan vendor:publish
+                命令执行后 会生成 config/captcha.php 文件
+            
+            3. 禁用验证：
+                要禁用验证码验证，请使用CAPTCHA_DISABLE环境变量。例如 .env 配置：
+                CAPTCHA_DISABLE = true
+
+2. 案例
+    在视图文件 resources\views\home\test\test13.blade.php 中，加入
+        <p>验证码：<input type="text" name="captcha"><img src="{{ captcha_src()}}"></p>
+    在 控制器文件 app\Http\Controllers\TestController.php 中加入 
+        //自动验证
+        public function test13(Request $request){
+            // 判断请求类型
+            // echo Input::method();
+            if (Input::method() == 'POST'){
+                // 自动验证
+                $this->validate($request,[
+                    // 具体的规则
+                    // 字段 => 验证规则1|验证规则2|验证规则3|...
+                    'name'      => 'required|min:2|max:20',
+                    'age'       => 'required|integer|min:1',
+                    'email'     => 'required|email',
+                    'captcha'   => 'required|captcha'               // 这里加入 规则 进行 验证
+                ]);
+                echo '输入的信息 没有问题';
+            }else{
+                // 展示视图
+                return view('home.test.test13');
+            }
+        }
+    注意：
+        验证码有效性 验证规则，手册里是没有的，如果使用 mews 验证码包 的话，其验证码 验证规则 就是 captcha
+
+*+++++* 数据表的迁移与填充
+    迁移：创建数据表的操作 + 删除数据表的 操作
+    填充：往数据表里 填充 写入 测试的数据（数据的插入操作）
+
+1. 数据的迁移操作
+    在迁移过程中，操作可以分为两个部分：创建 与 编写迁移文件、执行迁移文件
+    1. 迁移文件的创建与编写
+        迁移文件默认的位置。
+            database\migrations 目录下的文件 全都是 迁移文件
+            已经存在的 2 个文件，如果不打算使用 系统 自带的 认证模块 的话，需要删除掉。不然会 自动 给我们数据库 创建 2 张表。
+        1. 创建迁移文件
+        案例：需要 创建 试卷 的数据表，假设 数据表 名字是 paper。则迁移文件名可以写成：create_paper_table
+        创建的时候可以通过 自动代码生成工具 artisan 命令来执行 迁移文件的 生成。
+            php artisan make:migration 迁移文件名           // creat a new migration file
+            如：
+                php artisan make:migration create_paper_table
+    2. 编写 迁移文件 代码，让其能够实现 数据表的 创建（up方法）和 删除（donw方法）
+        在写之前，可以参考项目初始化 提供的 user 迁移文件
+        
+        Schema 门面（类）是用于操作数据表的门面，调用 其 具体的方法之后 就可以实现创建数据表 与 删除 数据表。
+        试卷表的 字段分析：
+            id              表的主键，自增
+            paper_name      试卷名称，唯一，varchar(100)，不为空
+            tatal_score     试卷总分，整型数字，tinyint，默认为 100
+            start_time      试卷开始考试时间，时间戳类型（整型 int）
+            duration        考试时间长度，单位分钟，整型 tinyint
+            status          试卷是否启用的状态，1 表示 启用，2 表示 禁用，默认 为 1，tinyint 类型
+        在创建数据表的列的时候遵循语法：
+            $table 表示 整个表 的实例
+            $table -> 列类型方法(字段名, [长度/值 范围]) -> 列修饰方法([修饰的值])
+
+        常用的列的类型：https://learnku.com/docs/laravel/5.3/migrations/1189 文档介绍
+            $table -> string('email')                           等同于数据库中的 varchar 列 
+            $table -> string('email', 100)                      等同于数据库中的 varchar 列 带个 长度
+            $table -> increment('id')                           等同于数据库中的 主键自增 ID
+            $table -> tinyInteger('age')                        等同于数据库中的 TINYINT 类型
+            $table -> integer('votes')                          等同于数据库中的 INTEGER 类型
+            $table -> enum('choices', ['foo','bar'])            等同于数据库中的 ENUM 类型
+
+        常用的列修饰方法：
+            $table -> after('column')	                        将此字段放置在其它字段「之后」（仅限 MySQL）
+            $table -> comment('my comment')	                    增加注释
+            $table -> default($value)	                        为此字段指定「默认」值
+            $table -> first()	                                将此字段放置在数据表的「首位」（仅限 MySQL）
+            $table -> nullable()	                            此字段允许写入 NULL 值
+            $table -> storedAs($expression)	                    创建一个存储的生成字段 （仅限 MySQL）
+            $table -> unsigned()	                            设置 integer 字段为 UNSIGNED
+            $table -> virtualAs($expression)	                创建一个虚拟的生成字段 （仅限 MySQL）
+
+
+        创建 数据表 迁移的 代码：
+            在 database\migrations\2024_02_24_130918_create_paper_table.php 文件中 编写
+
+    2. 执行迁移文件
+        执行 分为 up 和 down
+        Up 方法的执行：
+            如果 在 当前的项目中第一次执行迁移文件的话，则需要先去执行；
+            命令：
+                php artisan migrate:install
+            作用： 
+                这个命令执行完成后，会在数据库中 创建出一个 表名为 migration 的表
+                table migration (
+                    id          : 序号
+                    migration   : 已经执行过的 迁移文件名
+                    batch       : 批次号，执行的序号
+                )
+                migration 表 用于创建 记录 迁移文件的记录 数据表
+            需要执行 up 方法，则需要执行命令：（注意：需要删除系统 自带的 迁移文件，只保留自己的）
+                php artisan migrate
+            作用：
+                这个命令 执行完成后，
+                会 在数据库中 的 迁移记录表 migration 中增加一条记录信息
+                同时 产生了 paper 表
+        
+        Down 方法执行：（回滚操作，删除数据表）
+            php artisan migrate:rollback           【回滚最后一次的迁移操作】
+        注意：
+            删除（回滚）之后 
+            会删除 上一个 批次的 迁移记录，
+            并且 同批次建立的数据表 也会被 删除，
+            但是 迁移文件 依旧存在，方便后期 继续迁移（创建 数据表）
+
+2. 数据表填充器
+    填充操作 就是 往数据表中 写测试数据 的操作
+    1. 填充器（种子文件）的创建与编写
+        1. 填充器默认的所在目录
+            database\seeds 目录
+        2. 创建填充器
+            php artisan make:seeder 填充器名称      【约定俗成的写法：大写表名+TableSeeder】
+            例如：
+                以 paper 表为例，则名称应该为 PaperTableSeeder
+            创建 好 的 种子 文件：
+                php artisan make:seeder PaperTableSeeder
+        3. 编写填充器的代码，实现 往数据表 中 写入数据    【重点】
+            注意：
+                在填充器文件中 可以使用 DB 门面去新增数据，
+                但是 需要注意，DB门面 在使用的时候 不需要用户自己引入，一旦引入则报错，可以直接使用
+            public function run() {
+                //定义数组
+                $data = [
+                    [
+                        'paper_name'    => '文综',
+                        'start_time'    => strtotime('+7 days'),
+                        'duration'      => '120',
+                    ],
+                    [
+                        'paper_name'    => '理综',
+                        'start_time'    => strtotime('+7 days'),
+                        'duration'      => '120',
+                    ],
+                    [
+                        'paper_name'    => '英语',
+                        'start_time'    => strtotime('+7 days'),
+                        'duration'      => '120',
+                    ],
+                ];
+                // 写入数据
+                DB::table('paper') -> insert($data);
+            }
+
+    2. 执行填充器文件
+        命令：
+            php artisan db:seed --class=需要执行的种子文件名
+        种子文件 不像迁移文件，有单独的对应关系表 去记录，由于 没有任何记录，
+        所以在执行种子文件 的时候，需要指定执行的种子文件
+            php artisan db:seed --class=PaperTableSeeder
+        作用：
+            执行之后 数据表 中的 对应的数据 就存在。
+        注意：
+            填充器的 执行操作 没有回滚一说，没有删除。
+            如果需要回滚，则可以手动清空对应的数据表
+
+*+++++* 项目初始化（使用laravel做项目）
+1. 创建 laravel 项目
+2. 建立数据库
+3. 设置网站本地化为中文
+4. 设置项目使用的时区
+    修改系统默认 时区，
+    修改 配置文件 ：config/app.php
+        timezone 属性 修改为 Aisa/shanghai  Aisa/chongqing   PRC
+
+5. 清理项目（删除不需要的文件）
+    删除 app/Http/Controllers/Auth 目录，因为需要自定义登录逻辑
+    删除 database\migrations 目录下 所有 默认自带的  迁移文件
+    删除 database\seeds 目录 所有 默认自带的 初始种子文件
+    删除 resources\views\welcome.blade.php 欢迎页面
+    public 目录下 js、css 文件夹 也可以进行删除
+
+6. 关闭 MySql 的严格模式
+    编辑 config/database.php 将 strict 由 true 修改为 false
+    严格模式的功能说明
+        1. 不支持 not null 字段 插入 null 值
+        2. 不支持 对 自增长字段 插入值
+        3. 不支持 text 字段 有默认值
+
+7. 安装 debugbar 工具条
+    https://packagist.org/ 中下载 安装 使用
+
+*+++++* 响应处理
+    在 laravel 中，响应正常情况下有 2 个类型：常规的 直接响应，另一个是 Ajax 的响应。
+    其中 展示 视图 以及直接响应字符串 都 属于常规的 响应
+    例如：常规响应
+        展示视图
+            return view('welcome');
+        直接返回某个字符串
+            return 'hello world';
+
+1. ajax 请求的响应
+    常见的 ajax 响应数据类型：json 和 xml、text/html。
+    案例：
+        在页面中输出一个按钮，按钮要可以被点击，点击之后 发送 ajax 请求，请求后台的数据，后台返
+        回 前端 ajax 一个 json 的数据（不要使用 json_encode() 内置php的函数）
+
+        创建路由            
+            //响应方式
+            Route::get('/home/test/test16', 'TestController@test17');
+            Route::get('/home/test/test16', 'TestController@test17');
+        创建需要的 视图文件  resources\views\home\test\test16.blade.php 和 resources\views\home\test\test17.blade.php
+            其中 test16 主要 展示 视图页面，
+                 test17 负责 ajax 响应
+            // ajax 页面展示
+            public function test16(Request $request) {
+                return view('home.test.test16');
+            }
+            // ajax 的响应
+            public function test17(Request $request) {
+                return 'hello';
+            }
+        创建视图，并且将 视图的效果实现 如案例描述一样（引入jQuery）
+            <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        点击 按钮 之后 能够 产生 一个 ajax 请求
+            发送 ajax 请求：在 jQurey 中 4 种 发送 ajax 请求：
+            1. $.get        ：$.get ( url地址, [ 参数对象, 回调函数, 期望的放回类型 ])
+            2. $.post       ：$.post( url地址, [ 参数对象, 回调函数, 期望的放回类型 ])
+            3. $.ajax       ：$.ajax(obj)                                   参数 只有 一个，就是 参数的 对象
+            4. $.getJSON    ：$.getJSON( url地址, [ 参数对象, 回调函数])；    该方法 一般用于解决 跨域请求
+
+            <script type="text/javascript">
+                // jQuery 的 页面 载入 事件
+                $(function(){
+                    // 给按钮 绑定 点击事件
+                    $('#btn').click(function()){
+                        //发送 ajax 请求
+                        $.get('/home/test/test7', function(data){
+                            console.log('hwllo');
+                        }, 'json');
+                    }
+                })
+            </script>
+        响应处理 【重点】
+            在 laravel 中 框架 如果需要响应 json 数据，则写成
+            return response()->json(需要 json 输出的 数据);
+            
+            // ajax 页面展示
+            public function test16(Request $request) {
+                return view('home.test.test16');
+            }
+            // ajax 的响应
+            public function test17(Request $request) {
+                // 查询 数据
+                $data = Member::all();
+                // json格式 响应
+                // return json_encode($data);
+                return response()->json($data);
+                // return '{ "aa": "hello test17"}';
+            }
+        补充：
+            在 laravel 中 布尔值 是不能被 直接 通过 return 响应输出的。
+
+2. 跳转响应（重定向）
+    在有一些 页面，例如同步添加操作，完成 操作之后不能 停留在 当前页面，最好做 一个跳转 操作，也就是 需要一个 跳转的 响应
+    以 之前 “上传文件”（test14.blade.php） 操作代码为例：
+        后续 比较理想的 情况应该是在 处理完成之后 需要 一个 跳转提示。告知 用户 是否成功，成功则应该 返回上一页，失败输出提示。
+    两个跳转方式 任选一个：
+        return redirect(路由);
+        return redirect() -> to(路由);
+    例如：
+        //文件上传
+        public function test14(Request $request){
+            // 判断请求类型
+            if (Input::method() === 'POST'){
+                // 获取 传送过来的 文件信息 使用 $_FILES
+                // dd($_FILES);
+                
+                // dd($request->file('avatar'));
+                if ($request -> hasFile('avatar') && $request -> file('avatar') -> isValid() ) {
+                    // 获取 文件的 原始 名称
+                    // dd($request->file('avatar')->getClientOriginalName());
+                    // 获取文件的 大小 单位 Byte
+                    // dd($request->file('avatar')->getClientSize());
+                    $houZhui = $request->file('avatar')->getClientOriginalExtension();
+                    $filePath = md5(time() . rand(100000, 99999)) . '.' . $houZhui;
+                    $request->file('avatar')->move('./uploads',  $filePath);
+
+                    // 获取全部的数据
+                    $data = $request->all();
+                    // dd($data);
+                    // 此时 $data 里的 avatar 属性中的 值 是一个 Illuminate\Http\UploadedFile 对象
+                    $data['avatar'] = './uploads/' . $filePath;  // 这里 将  $data 里的 avatar 属性 的值 重新赋值 为 文件名 字符串
+                    // dd($data);
+                    $res = Member::create($data);
+                    // dd($res);
+                    if ($res == true) {
+                        return redirect('/');                       // 这里 跳转响应（重定向）到 “/” 根 目录
+                    }
+                }
+            }else{
+                // 展示视图
+                return view('home.test.test14');
+            }
+        }
+
+
+*******************    Day04    ******************

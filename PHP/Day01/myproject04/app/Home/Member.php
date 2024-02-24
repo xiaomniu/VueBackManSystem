@@ -13,5 +13,5 @@ class Member extends Model
     //定义 禁止操作 时间
     public $timestamps = false;
     //设置 允许写入的 数据字段
-    protected $fillable = ['id', 'name', 'age', 'email'];
+    protected $fillable = ['id', 'name', 'age', 'email', 'avatar'];
 }

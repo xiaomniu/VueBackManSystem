@@ -165,6 +165,8 @@ return [
         /*
          * Package Service Providers...
          */
+        // 验证码的 服务提供者
+        Mews\Captcha\CaptchaServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -228,6 +230,7 @@ return [
 
         // 自己添加的别名
         'Input' => Illuminate\Support\Facades\Input::class,
+        'Captcha' => Mews\Captcha\Facades\Captcha::class,
     ],
 
 ];

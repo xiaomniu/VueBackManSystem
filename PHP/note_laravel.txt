@@ -1,3 +1,6 @@
+PHP 预定义变量：
+    https://www.php.net/manual/en/reserved.variables.php
+
 *******************    Day01    ******************
 目前大部分的框架公共的特点
 1. 单入口，所有的请求必须从 单入口开始，主要是便于管理（统一的参数过滤）
@@ -32,6 +35,7 @@ composer 方式部署 laravel 项目
 
         composer create-project --prefer-dist laravel/laravel ./myproject04 "5.8.*"
         composer create-project laravel/laravel=5.8.* --prefer-dist ./myproject04
+        
 
         更新 composer 程序
             composer self-update
@@ -1563,3 +1567,131 @@ composer 方式部署 laravel 项目
 
 
 *******************    Day04    ******************
+
+*+++++* 会话控制
+    常见应用 - 增删改查
+    session 默认存到文件中
+    session 文件目录：storage/framework/sessions
+1. 使用 session 门面
+    控制器 头部引用 use Illuminate/Support/Facades/Session;
+    由于 session 门面在 app.php 中 已经定义好 别名，所以在控制器 中 引入的时候 可以直接 use Session;
+    常用的 静态方法：
+        Session::put('key', 'value');               Session 中存储 一个 变量
+        $value = Session::get('key');               Session 中获取 一个 变量
+        $value = Session::get('key', 'defaultValue');               Session 中获取 一个 变量 或 返回 一个 默认值（如果变量不存在）
+        $value = Session::get('key', function(){ return 'default';});
+        Session::all();                             Session 中获取所有变量
+        Session::has('users');                      检查一个变量是否 在 Session 中 存在
+        Session::forget('key');                     Session 中 删除一个变量
+        Session::flush();                           Seesion 中 删除 所有变量
+        补充：session 方法 也可以 在视图中使用，如：{{ $session::get('code') }}
+    案例：
+        把 上述 的 Session 方法 用 一遍。
+        创建路由 和 方法：
+            // 会话 控制
+            Route::get('/home/test/test18', 'TestController@test18');
+            
+            // 会话控制
+            public function test18(Request $request) {
+                return view('home.test.test18');
+            }
+
+            // 会话控制
+            public function test18(Request $request) {
+                //Session 中存储 一个 变量
+                Session::put('name', '路飞');               
+                //Session 中获取 一个 变量
+                $value = Session::get('name');               
+                //Session 中获取 一个 变量 或 返回 一个 默认值（如果变量不存在）
+                $value = Session::get('gender', '保密');               
+                $value = Session::get('gender', function(){ return '男';});
+                //Session 中获取所有变量
+                Session::all();                             
+                //检查一个变量是否 在 Session 中 存在
+                Session::has('name');                      
+                //Session 中 删除一个变量
+                Session::forget('name');                     
+                //Seesion 中 删除 所有变量
+                Session::flush();                           
+            }
+
+*+++++* 缓存操作
+    laravel 为 不同的 缓存 系统 提供了统一的 API。缓存配置与 config/cache.php。
+    在 该文件中你可以指定在 应用中 默认使用 哪个 缓存驱动。
+    如：
+        'default' => env('CACHE_DRIVER', 'file'),
+    laravel 目录 支持 主流的 缓存后端
+    如：Memcached、Redis 等。
+    主要方法：
+        Cache::put()
+        Cache::get()            发现 ：使用 dd( Cache::get('xixixiyi')); 打印 时 会立即 删除 缓存项
+        Cache::add()
+        Cache::pull()
+        Cache::(forever)
+        Cache::forget()
+        Cache::has()
+    系统 默认 使用 文件 缓存，其缓存文件 储存位置在 ：storage\framework\cache\data
+    1. 设置缓存
+        语法：Cache::put('key', 'value', $minutes);
+        注意：如果该键 已经存在，则直接覆盖原来的值，有效期 必须设置，单位是 分钟
+
+        语法：Cache::add('key', 'value', $minutes);
+        add 方法 只会在 缓存项 不存在 的情况下 添加数据 到 缓存，如果 数据 被添加到缓存 返回 true，否则 返回 false
+
+        永久存储数据
+        forever 方法用于 持久化 存储数据到 缓存，这些值 必须通过 forget 方法 手动从 缓存 中移除
+        Cache::forever('key', 'value');
+    2. 获取 缓存数据
+        Cache 门面的 get 方法 用于 从缓存中 获取 缓存项，如果缓存项 不存在，返回 null。如果需要的话 可以 传递 第二个 参数
+        到 get 方法 指定 缓存项 不存在时 返回 的 自定义默认值
+        $value = Cache::get('key');
+        $value = Cache::get('key', 'default');
+        可以 传递一个匿名函数 作为 默认值，如果缓存 项 不存在的话，闭包的结果 将会 被返回。传递匿名函数 允许 你可以从数据库
+        或 其他 外部服务 获取默认值。
+        $value = Cache::get('key', function(){
+            return DB::table(...)->get();
+        });
+        检查缓存项 是否 存在
+        has 方法 用于 判断 缓存项 是否存在
+        if (Cache::has('key')){
+            //...
+        }
+    3. 删除缓存数据
+        语法：
+            $value = Cache::pull('key'); 从缓存中 获取 缓存项 然后 删除，如果缓存项 不存在的话 返回 null，设置一次性的缓存项 时 使用。
+            Cache::forget('key'); 使用  forget 方法 从缓存中 移除 缓存项数据
+            Cache::flush(); 使用 flush 方法 清除 所有 缓存，并且删除对应的 目录
+    4. 缓存数值 增加 / 减少
+        increment 和 decrement 方法 可以 用于 调整 缓存中 的 整型数值。这 两个方法 都可以 接收 第二个参数 来
+        指明 缓存项 数值 增加 和 减少 的 数值。
+        Cache::increment('key');
+        Cache::increment('key', $amount);
+        Cache::decrement('key');
+        Cache::decrement('key', $amount);
+    5. 获取并存储
+        有时候可能 想要 获取 缓存项，但是 如果请求的 缓存项 不存在 时 给它 存储一个 默认值。
+        例如，可能想要 从缓存中给获取 所有用户，或者 如果 他们 不存在的话， 
+        从数据库获取他们 并 将其 添加 到 缓存中，可以使用 Cache::remember() 方法实现。
+        $value = Cache::remember('user', $minites, function(){
+            return DB::table('users')->get();
+        });
+        如果缓存项 不存在，传递给 remember 方法的闭包 被执行 并且将结果存放 到缓存中
+
+        还可以 联合 remember 和 forever 方法：
+        $value = Cache::rememberForever('users', function(){
+            return DB::table('users')->get();
+        });
+
+    案例：
+        添加 路由 及 方法：
+            // 缓存 操作
+            Route::get('/home/test/test19', 'TestController@test19');
+            
+            // 使用 Cache 方法，需要 先 引入 ：use Cache;
+            // 缓存 操作
+            public function test19(Request $request) {
+                return 'hello 19';
+            }
+
+*+++++* 联表查询
+*+++++* 关联模型（重点 + 难点）

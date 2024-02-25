@@ -77,3 +77,9 @@ Route::get('/home/test/test15', 'TestController@test15');
 //响应方式
 Route::get('/home/test/test16', 'TestController@test16');
 Route::get('/home/test/test17', 'TestController@test17');
+
+// 会话 控制
+Route::get('/home/test/test18', 'TestController@test18');
+
+// 缓存 操作
+Route::get('/home/test/test19', 'TestController@test19');

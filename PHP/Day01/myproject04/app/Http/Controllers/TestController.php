@@ -14,6 +14,12 @@ use DB;
 //引入自定义模型
 use App\Home\Member;
 
+// 引入 Session 门面
+use Session;
+
+// 引入 Cache
+use Cache;
+
 class TestController extends Controller {
     // 测试控制器 路由的 使用
     // phpinfo 信息：
@@ -293,12 +299,41 @@ class TestController extends Controller {
         // 查询 数据
         $data = Member::all();
         // json格式 响应
-        // return json_encode($data);
-        // return response()->json($data);
+
         // return '{ "aa": "hello test17"}';
         // return "{ 'aa': 'hello test17'}";    // 不能响应
         // return true;                         // 不能响应
         // return 'hello test1111777';          // 不能响应
         // return ['hell'];
+        // return json_encode($data);
+        return response()->json($data);
+    }
+    
+    // 会话控制
+    public function test18(Request $request) {
+        //Session 中存储 一个 变量
+        Session::put('name', '路飞');               
+        //Session 中获取 一个 变量
+        $value = Session::get('name');               
+        //Session 中获取 一个 变量 或 返回 一个 默认值（如果变量不存在）
+        $value = Session::get('gender', '保密');               
+        $value = Session::get('gender', function(){ return '男';});
+        //Session 中获取所有变量
+        Session::all();                             
+        //检查一个变量是否 在 Session 中 存在
+        Session::has('name');                      
+        //Session 中 删除一个变量
+        Session::forget('name');                     
+        //Seesion 中 删除 所有变量
+        Session::flush();                           
+    }
+    
+    // 缓存 操作
+    public function test19(Request $request) {
+        // Cache::put('xixixiyi', 'value-xixixiyi', 10);
+        echo Cache::get('xixixiyi');
+        
+        // dd( Cache::get('xixixiyi'));
+        // return 'hello 19';
     }
 }

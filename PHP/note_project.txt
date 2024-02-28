@@ -66,4 +66,6 @@ composer create-project --prefer-dist laravel/laravel ./edu01 "8.5.19"
         ReflectionException             异常映射
         RuntimeException                运行期异常 运行时异常 运行异常 未检查异常
         ErrorException                  框架运行错误
-        
+
+新建数据库 mileduo@php_test_8012
+    字符集：utf8mb4 / utf8mb4_croatian_ci

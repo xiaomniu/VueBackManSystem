@@ -1,1 +1,1 @@
-setx "http_proxy" "127.0.0.1:50315"
+setx "http_proxy" "127.0.0.1:50305"

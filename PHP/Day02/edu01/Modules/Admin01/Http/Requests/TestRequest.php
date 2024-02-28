@@ -2,7 +2,8 @@
 
 namespace Modules\Admin01\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
+// use Illuminate\Contracts\Validation\Validator;
+use Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TestRequest extends FormRequest
@@ -25,7 +26,7 @@ class TestRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|max:2',
+            'title' => 'required|max:2|is_positive_integer',
             'body'  => 'required'
         ];
     }
@@ -35,7 +36,7 @@ class TestRequest extends FormRequest
         return [
             'title.required' => '标题必传',
             'title.max' => '长度不超过2',
-            // 'title.is_positive_integer' => '必须正整数',
+            'title.is_positive_integer' => '必须正整数',
             'body.required' => 'body必传',
         ];
     }

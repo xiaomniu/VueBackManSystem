@@ -2,7 +2,8 @@
 
 namespace Modules\Admin01\Providers;
 
-use Illuminate\Contracts\Validation\Validator;
+use Validator;
+// use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -25,11 +26,19 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-        // Validator::extend('is_positive_integer', function($attribute, $value, $parameters, $validator){
-        //     if (is_numeric($value)){
+        Validator::extend('is_positive_integer', function($attribute, $value, $parameters, $validator){
+            if (is_numeric($value)){
+                return true;
+            }
+            return false;
+        });
+        
+        // Validator::extend('is_positive_integer', function($attribute, $value, $parameters, $validator) {
+        //     if (is_numeric($value) && is_int($value + 0) && ($value + 0) > 0) {
         //         return true;
+        //     }else{
+        //         return false;
         //     }
-        //     return false;
         // });
     }
 

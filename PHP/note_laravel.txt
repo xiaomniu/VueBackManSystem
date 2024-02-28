@@ -173,22 +173,22 @@ composer 方式部署 laravel 项目
                             try_files $uri $uri/ /index.php?$query_string;
                         }
                     2. 如果使用 apache 则 在 文件 E:\GitRepository\VueBackManSystem\PHP\Day01\myproject04\public\.htaccess 中 添加以下配置
-                        <IfModule mod_rewrite.c>
-                            RewriteEngine On
-                            RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-                            RewriteBase /
-                            RewriteRule ^index\.php$ - [L]
-                            RewriteCond %{REQUEST_FILENAME} !-f
-                            RewriteCond %{REQUEST_FILENAME} !-d
-                            RewriteRule . /index.php [L]
-                        </IfModule>
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteBase /
+    RewriteRule ^index\.php$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+</IfModule>
                 原因：
                     使用 phpstudy_pro 默认的配置，应请求 /login , nginx 会尝试查看是否有一个名为 /var/www/html/myproject/public/login 的文件存在，那么如果一个名为 /var/www/html/myproject/public/login/ 的文件夹如果它们都不存在，则返回错误 404。
                     这不是您所期望的，因为您没有创建名为 login 的文件。 ，你刚刚在 Laravel 的路由器中创建了一个路由。因此，您必须以调用 index.php 的方式配置 nginx。每次向该虚拟主机请求时，公共(public)目录的文件，然后框架将能够将请求所针对的 URL 与您注册的路由进行比较。
                     您应该编辑您的配置以添加以下位置 block ，以便将所有请求(静态资源的请求除外)重定向到 index.php ，以原始查询为参数:
-                    location / {
-                        try_files $uri $uri/ /index.php?$query_string;
-                    }
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
 
         2.3. 请求方式
             有效的路由方法

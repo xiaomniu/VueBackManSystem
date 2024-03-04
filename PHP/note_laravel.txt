@@ -36,6 +36,7 @@ composer 方式部署 laravel 项目
         composer create-project --prefer-dist laravel/laravel ./myproject04 "5.8.*"
         composer create-project laravel/laravel=5.8.* --prefer-dist ./myproject04
         
+        npm install vue-template-compiler vue-loader vue-router vuex axios vue-axios --save-dev --legacy-peer-deps
 
         更新 composer 程序
             composer self-update
@@ -1695,3 +1696,123 @@ location / {
 
 *+++++* 联表查询
 *+++++* 关联模型（重点 + 难点）
+
+
+
+
+
+
+*************** 显示加载 loading 界面 ************
+// 以下是 web.php 中的 路由注册代码
+Route::get('add-employee",[EmployeesController::class, 'create']);
+Route::post('save-employee', [EmployeesController::class, 'storeEmployee']);
+Route::get('employees', [EmployeesController::class,'index']);
+Route::get('get-employee-data', [Employeescontroller::class, 'getEmployeeData']);
+Route::get('edit-employee/{id}/edit',[EmployeesController::class,'edit']);
+Route::get('fetch-employee-data/{id}',[Employeescontroller::class, 'getEmployeeData']);
+Auth::routes();
+/*
+其中 Auth::routes() 加载自动生成的路由配置，具体文件为：vendor\laravel\ui\src\AuthRouteMethods.php
+Auth::routes([
+    'login'    => true,
+    'logout'   => true,
+    'register' => true,
+    'reset'    => true,  // for resetting passwords
+    'confirm'  => false, // for additional password confirmations
+    'verify'   => false, // for email verification
+]);
+*/
+Route::get('home',[Employeescontroller::class, 'index'])->name('routname001');
+
+// 以下是 .vue 组件文件中的 按钮点击后 调用的方法
+saveForm(formNmae){
+    this.$refs[formName].validate((valid)=>{
+        if (valid){
+            if (this.scope == 'create'){
+                this.$store.dispatch('saveemployee', this.form);
+            }else{
+                this.$store.dispatch('updateemployee', {
+                    id : this.id,
+                    form : this.form,
+                });
+            }
+        }
+    })
+}
+
+// 以下是 vuex 中 actions.js 中的 方法
+let loader = null;
+funciton displayLoader(loadingText = 'loading...) {
+    loader = Vue.prototype.$loading({
+        lock : true,
+        text : loadingText,
+        spinner : 'el-icon-loading',
+        background : 'rgb(255,255,255,0.85)',
+    });
+}
+
+funciton removeLoader() {
+    loader.close();
+}
+
+export const saveemployee = ({commit}, payload)=>{
+    displayLoader();
+
+    //  这里使用 post 请求 方式  回到  php 路由中，然后 调用  对应这个路由 注册 的 Controller类 的 storeEmployee()方法，在方法中 最后 进行  response 回到 saveemployee 函数中
+    axios.post('/save-employee', payload).then(res = >{
+        Vue.prototype.$notify({
+            title : 'success',
+            message : 'Employee added Successfully',
+            type : 'success'
+        });
+
+        removeLoader();
+        setTimeout(()=>{
+            window.location.href = '/employees'
+        }, 2000);
+    })
+}
+
+export const getEmployeeesData = ({commit}, payload)=>{
+    axios.get('/get-employee-data', payload).then(
+        response => {
+            commit('setTableData', response.data);
+        }
+    )
+}
+
+//以下是 注册的 响应路由对应的 Controller 中的方法
+public storeEmployee(Request $request){
+    try{
+        $employee = new Employee;
+        $employee->name = $request->name;
+        $employee->department = $request->department;
+        $employee->section = $request->section;
+        $employee->email = $request->email;
+        $employee->save();
+        return response()->json(){[
+            'status' => 200,
+            'message' => 'Employee Saveed Successfully',
+        ]};
+    }
+    catch(Exception $e) {
+        dd($e);
+    }
+}
+
+// 确认对话框
+this.$confirm('Are you sure, you want delete this item?', 'warning',{
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+    type: 'warning'
+}).then(()=>{
+    this.$message({
+        type:'success',
+        message: 'delete completed',
+    });
+}).catch(()=>{
+    this.$message({
+        type: 'info',
+        message: 'Delete canceled'
+    });
+});

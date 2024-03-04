@@ -1,0 +1,269 @@
+laravel 框架  +  vue 单文件 组件 + vue-router + vuex
+
+新建laravel项目，运行以下命令后，会在当前 文件夹下 生成一个 名为 “LaravelVuex” 的文件夹，这个就是项目的 主目录
+    composer create-project laravel/laravel=8.* --prefer-dist ./LaravelVuex
+
+项目代码下载完成后，将 跨域 post 请求 限制 关闭
+    在 app\Http\Middleware\VerifyCsrfToken.php 文件中 “$except” 属性值中加入 “*”
+    代码如下：
+        class VerifyCsrfToken extends Middleware {
+            protected $except = [
+                "*"
+            ];
+        }
+
+********** 注意 **********
+控制台切换操作目录：
+    cd ./LaravelVuex
+本文的以下的 所有命令 都要在 项目根目录（public目录所在的文件夹路径下）中 执行
+********** 注意 **********
+
+如果想要在 Laravel 项目中开箱使用 Bootstrap 和 Vue 框架，需要运行如下命令安装 laravel/ui 库
+    composer require laravel/ui
+
+再运行如下 Artisan 命令初始化 Bootstrap 和 Vue 组件脚手架代码：
+    php artisan ui bootstrap
+    php artisan ui vue
+
+脚手架安装完成后，就可以使用 npm 安装 vue 的依赖包了，运行如下 命令：
+    // npm install vue-template-compiler vue-loader vue-router vuex axios vue-axios --save-dev --legacy-peer-deps
+    // npm install vue-router vuex vue-axios --save-dev --legacy-peer-deps
+    npm install vue-router@3 vuex@3 vue-axios
+
+所有包安装完了后，就可以开始 下载依赖代码了，运行如下命令；
+
+
+以上操作 都做完了之后
+    项目 resources\js 目录下 ，这个是脚手架 自动创建的 案例 vue 文件
+    可以看到会 多出 “components” 文件夹（ Vue 组件）和 JavaScript 入口文件（app.js）
+    其中  resources\js\app.js 和 resources\js\bootstrap.js 文件 对比 原始的文件 都有 相应的 小改动
+
+    其中 app.js 中的 
+        “Vue.component('example-component', require('./components/ExampleComponent.vue').default);”
+        代码，是用来注册 组件的。和 vue-cli 里的 注册 vue 组件 方法类似，第一个参数就是
+        “组件名字”
+
+在 resources\js 下 新建 文件夹 store，用来存放 vuex 的 数据仓库 文件
+    新建文件：resources\js\store\index.js 编写以下代码 导出 store 对象
+        import Vue from 'vue'
+        import Vuex from 'vuex'
+        import user from './modules/user.js'
+        import setting from './modules/setting.js'
+        Vue.use(Vuex)
+        const store = new Vuex.Store({
+            strict : true,
+            modules:{
+                user : user,
+                setting,
+            },
+            mutations : {
+                updateUser(state, user){
+                    console.log('globel')
+                    state.userInfo = user
+                }
+            }
+        });
+        export default store
+    新建 resources\js\store\modules 文件目录 存放 分模块的 各个业务的 小的 数据仓库文件
+        新建 resources\js\store\modules\user.js 用来存放 user 相关数据仓
+
+            '''
+            import Vue from 'vue'
+            import axios from 'axios'
+            import VueAxios from 'vue-axios'
+            Vue.use(VueAxios, axios)
+
+            const state = {
+                userInfo:{
+                    name: 'zs',
+                    age: 18
+                }
+            }
+
+            const mutations = {
+                updateUser(state, user){
+                    console.log('user')
+                    state.userInfo = user
+                }
+            }
+
+            const actions = {
+                updateUserAsync(context, user){
+                    setTimeout(() => {
+                        // context.commit('模块名/函数名', payload)
+                        context.commit('updateUser', user)
+                    }, 2000);
+                },
+                updateUserToDbAsync(context, user){
+                    axios.post('/test-update-user', user).then((response) => {
+                        console.log('test-update-user:', response.data.data)
+                        context.commit('updateUser', response.data.data)
+                    })
+                }
+            }
+
+            const getters = {
+                upperName(state){
+                    // 全转为 大写
+                    return state.userInfo.name.toUpperCase();
+                }
+            }
+
+            export default {
+                namespaced:true,
+                state,
+                mutations,
+                actions,
+                getters,
+            }
+            '''
+
+        新建 resources\js\store\modules\setting.js 用来存放 setting 相关数据仓
+            '''
+            const state = {
+                theme:'dark',
+                desc:'项目的描述信息'
+            }
+
+            const mutations = {
+                updateUser(state, user){
+                    console.log('setting')
+                    state.userInfo = user
+                }
+            }
+
+            const actions = {
+
+            }
+
+            const getters = {
+
+            }
+
+            export default {
+                namespaced:true,
+                state,
+                mutations,
+                actions,
+                getters,
+            }
+            '''
+有了 组件名字  和  vuex 的 仓库 store 对象 就可以开始 使用了
+    在 原 laravel 工程中，的 resources\views 目录中，存放者 laravel 原始的视图文件（*.blade.php）。
+    复制一个 .blade.php 文件 命名名为 test.blade.php，然后 清除 真个 “body” 下的所有元素，只留 <body></body>。
+    就以 这个新文件来引用 之前 准备好的 组件名为 “example-component” 组件。
+    使用步骤：
+        在 testvuex.blade.php 视图文件中的 body 区域中 加入 一个 <div> 并 赋予 id 值
+        引入 vue 编译好的 vue入口 文件 'js/app.js' 
+        引入 bootstrap 的 对应的 css 文件 'css/app.css'
+        引入 vue 准备好的测试组件：example-component
+        完整代码如下：
+            <head>
+                <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+            </hear>
+            <body>
+                <div id="app">
+                    <example-component></example-component>
+                </div>
+                <script src="{{ asset('js/app.js') }}"></script>
+            </body>
+
+在 LaravelVuex\routes\web.php 中新增 两个路由（get 和 post）
+    Route::get('/test-vuex', function () {
+        return view('test.testvuex');               // 'test.testvuex' 对应的是 resources\views\test\testvuex.blade.php 视图文件
+    });
+    Route::post('/test-update-user', [
+        UserController::class, 'updateUser'
+    ]);
+
+在项目主目录下 执行如下 命令：
+    php artisan make:controller User/UserController
+    这个命令会 创建 一个 控制器文件，位置：app\Http\Controllers\User\UserController.php 
+    编写一个 updateUser 方法，用来 处理 '/test-update-user' 路由的 post请求
+    代码如下：
+        '''
+        class UserController extends Controller
+        {
+            public function updateUser(Request $request){
+                $all = $request->all();
+                // dd($all);
+                $data = [
+                    'name' => $all['name'] .'xixixix',
+                    'age' => $all['age'] + 234,
+                ];
+                // $this->resultJson($data);
+                return response()->json([
+                    "status"=> "success",
+                    "message"=> "okokok",
+                    "data" => $data
+                ]);
+            }
+        }
+        '''
+
+laravel 框架 向 vue组件传值
+    1. 使用 LaravelVuex\routes\web.php 加入 get 路由请求，然后 在 vue组件文件中 发送 axios.get() 方法进行 数据传输
+        // .php 文件中
+        Route::get("/get-data", function () {
+            return response()->json([
+                'name' => 'xixix',
+                'age' => 23,
+            ]);
+        });
+        // .vue 文件中
+        {
+            data(){
+                return {
+                    name : '',
+                    age : 0,
+                }
+            },
+            created(){
+                axios.get('/get-data').then((res)={
+                    this.name = res.data.data.name;
+                    this.age = res.data.data.age;
+                })
+            }
+        }
+
+    2. 视图文件 *.blade.php 向 vue组件 传值，使用 vue 的 props 属性进行传值
+        // .php 文件中
+        Route::get("/test", function () {
+            $data = [
+                'name' => 'xixix',
+                'age' => 23,
+            ];
+            $keyword = '333';
+            return view('agent.home', compact(
+                'data', 'keyword'
+            ));
+        });
+
+        // .blade.php 文件中
+        <body>
+            <div id="app">
+                <agent-component :recv="{{ json_encode($data) }}" :keyword="{{ json_encode($keyword) }}" >你好，学院君！</agent-component>
+            </div>
+            <script src="{{ asset('js/app.js') }}"></script>
+        </body>
+
+        // .vue 文件中
+        {
+            props:[
+                'data',
+                'keyword'
+            ],
+            data(){
+                return {
+                    data_in: '',
+                    keyword_in: '',
+                }
+            },
+            created(){
+                // console.log('creatd ：', this.data, this.keyword);
+                this.data_in = this.data;
+                this.keyword_in = this.keyword;
+            },
+        }
+
+至此，可以在浏览器中 输入 “http://localhost/test-vuex” 进行 测试了。

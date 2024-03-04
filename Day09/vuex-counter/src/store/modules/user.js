@@ -21,6 +21,12 @@ const actions = {
             // context.commit('模块名/函数名', payload)
             context.commit('updateUser', user)
         }, 2000);
+    },
+    updateUserAsync(context, user){
+        setTimeout(() => {
+            // context.commit('模块名/函数名', payload)
+            context.commit('updateUser', user)
+        }, 2000);
     }
 }
 

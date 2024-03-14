@@ -1,3 +1,6 @@
+查询本机端口号 占用情况（过滤 端口号 包含 '80' 字符串 ）
+    netstat -ano | findstr :80
+
 PHP 预定义变量：
     https://www.php.net/manual/en/reserved.variables.php
 
@@ -7,6 +10,30 @@ PHP 预定义变量：
 2. MVC的思想
 3. ORM 操作数据库（Object Relations Model）：AR模式
 注意：Laravel 框架有一个特点，所有 URL 访问都必须事先 定好 路由规则
+
+
+VSCODE 配置  XDebug
+安装好 XDebug 后
+在 C:\Users\Administrator\AppData\Roaming\Code\User\settings.json 文件中 配置
+    "php.validate.executablePath": "C:\\DevEnv\\phpstudy_pro\\Extensions\\php\\php7.3.4nts\\php.exe",
+    "php.debug.executablePath": "C:\\DevEnv\\phpstudy_pro\\Extensions\\php\\php7.3.4nts\\php.exe",
+    可以在 VSCODE File -> Preferences -> Settings  中。 输入 PHP 然后
+        Extensions 中 点开 "Edit In Settings" 中配置
+    打开  phpstudy_pro 中的 软件管理 找到  php 对应的设置 按钮 ，弹出 PHP设置界面 中 切换 到 扩展组件  勾选 上 XDebug 并 勾选上 profile 和 trace 选项。
+    php.ini 中 添加 如下
+        xdebug.remote_enable = 1
+        xdebug.remote_autostart = 1
+        xdebug.remote_port = 9003
+
+在 Laravel 使用 自带的 phpredis 需要 在 PHP 设置界面  中 扩展组件中  勾选上  Redis数据库缓存组件
+
+
+“cURL error 60: SSL certificate problem: self signed certificate in certificate chain”  报错问题
+    将 E:\GitRepository\VueBackManSystem\PHP 中 ca-cert-master.zip 的 ca-cert.crt 文件  复制到 
+    C:\DevEnv\phpstudy_pro\Extensions\php\php7.3.4nts\extras\ssl 文件夹中
+    然后 在 php.ini 中 配置文
+        curl.cainfo = "C:\DevEnv\phpstudy_pro\Extensions\php\php7.3.4nts\extras\ssl\ca-cert.crt"
+        openssl.cafile="C:\DevEnv\phpstudy_pro\Extensions\php\php7.3.4nts\extras\ssl\ca-cert.crt"
 
 
 php版本：7.0.12-nts

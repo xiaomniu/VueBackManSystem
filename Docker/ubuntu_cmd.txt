@@ -1,0 +1,44 @@
+ls 命令：
+    列出当前文件夹中以字母"a"开头的所有文件和文件夹：
+        ls a*
+    列出当前文件夹中以数字"1"开头的所有文件和文件夹：
+        ls 1*
+    列出指定文件夹（例如/home/user/Documents）中以字母"a"开头的所有文件和文件夹：
+        ls /home/user/Documents/a*
+    列出当前文件夹中以字母"a"或"b"开头的所有文件和文件夹：
+        ls [ab]*
+    ls命令区分大小写，因此它会分别显示以大写和小写字母开头的文件和文件夹。如果你希望不区分大小写，可以使用ls命令的-i选项，它会在输出中忽略大小写。
+        ls -i a*
+
+docker run \ 
+    -itd \
+    --name ${container_name} \
+    --privileged=true \
+    --net mynet \
+    --ip ${IP} \
+    --restart=always \
+    -v /ky_volume:/ky_workspace  ${image_name}:${image_tag}  /usr/sbin/init
+
+// 进入 docker 容器
+docker exec -it 容器名|容器ID /bin/bash
+
+// 查看 当前  docker 里所有的 容器的详细信息
+docker ps -a --no-trunc
+docker inspect 容器ID
+docker inspect -f '{{.Config.Image}}' 容器ID
+
+docker查看容器进程命令
+    docker ps
+        命令可以查看所有正在运行的容器进程，包括容器的ID、名称、状态、启动时间等信息。
+    docker top <容器ID或名称>
+        命令可以查看指定容器的进程列表，包括进程ID、用户、CPU使用率、内存使用量等信息。
+    docker exec <容器ID或名称> ps
+        命令可以在指定容器内部执行ps命令，查看容器内部的进程列表。
+    docker stats <容器ID或名称>
+        命令可以实时监控指定容器的资源使用情况，包括CPU、内存、网络等指标，也可以通过-d参数将监控结果导出为CSV格式。
+    docker inspect <容器ID或名称>
+        命令可以查看指定容器的详细信息，包括进程、网络、卷挂载等配置内容，通过过滤器可以提取出进程相关的信息。
+    docker top
+        命令可以查看所有容器的进程列表，类似于Linux的top命令，可以按照CPU、内存等指标进行排序和过滤。
+
+    注意：以上命令均需在Docker主机上执行。

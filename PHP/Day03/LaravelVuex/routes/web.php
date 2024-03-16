@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\ComplexTableController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,3 +34,6 @@ Route::get("/test-get-data", function () {
         'data', 'keyword'
     ));
 });
+
+//修改web.php，增加一行：
+Route::get('/complex-table',[ComplexTableController::class, 'index']);

@@ -1,0 +1,442 @@
+本机： Ubuntu 20.04 LTS (GNU/Linux 5.4.0-171-generic x86_64)
+
+sudo apt-get update
+    这个命令，会访问源列表里的每个网址，并读取软件列表，然后保存在本地电脑。我们在新立得软件包管理器里看到的软件列表，都是通过update命令更新的。
+sudo apt-get upgrade
+    这个命令，会把本地已安装的软件，与刚下载的软件列表里对应软件进行对比，如果发现已安装的软件版本太低，就会提示你更新。
+    如果你的软件都是最新版本，会提示：
+        升级了 0 个软件包，新安装了 0 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级
+
+根据不同 ubuntu 版本设置不同的镜像源
+    ubuntu 根据系统版本的不同其设置的镜像源也不同，版本有 focal 和 bionic 等，具体换源方式如下：
+    使用如下命令，查询自己的Ubuntu系统属于哪种版本：
+        lsb_release -c 
+        命令执行后，显示
+            Codename:       focal
+
+utuntu 设置 软件下载 全局下载源：
+    备份之前的 sources.list 文件：
+        sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    修改 sources.list 文件，将文件中的内容替换为以下内容：
+        deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+    更新软件包列表：
+        sudo apt-get update
+        sudo apt-get upgrade
+
+
+Ubuntu使用apt国内源并安装docker（阿里源/清华源）
+    ****   focal  版本    ****
+        # 阿里源
+        deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+
+        # 清华园
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-updates main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-updates main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-backports main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-security main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-security main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-proposed main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ eoan-proposed main restricted universe multiverse
+
+    ****   bionic  版本    ****
+        # 阿里源
+        deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+        deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+        deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+
+        # 清华源
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+        deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
+        deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
+
+        #  中科大源
+        deb https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiverse
+        deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiverse
+        deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+        deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+        deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+        deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+        deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+        deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+        deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
+        deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
+
+
+卸载 Docker 引擎
+    卸载 Docker Engine、CLI、containerd 和 Docker Compose 软件包：
+        sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+    主机上的映像、容器、卷或自定义配置文件不会自动删除。要删除所有映像、容器和卷
+        sudo rm -rf /var/lib/docker
+        sudo rm -rf /var/lib/containerd
+    您必须手动删除任何编辑的配置文件
+
+安装 Docker 
+    在安装 Docker Engine 之前，您需要卸载所有冲突的软件包
+    要卸载的非官方软件包有：
+        docker.io
+        docker-compose
+        docker-compose-v2
+        docker-doc
+        podman-docker
+    此外，Docker Engine 依赖于containerd和runc。Docker 引擎将这些依赖项捆绑为一个捆绑包：containerd.io. 
+    如果您之前安装过containerd或runc，请卸载它们以避免与 Docker Engine 捆绑的版本冲突
+    运行以下命令卸载所有冲突的包：
+        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+    卸载 Docker 时，不会自动删除存储在 “/var/lib/docker/” 中的映像、容器、卷和网络
+
+    使用 apt repository 安装
+        在新主机上首次安装 Docker Engine 之前，需要设置 Docker 存储库。之后，您可以从存储库安装和更新 Docker。
+        设置 apt repository，如下命令 直接复制进 终端中 回车即可：
+            # Add Docker's official GPG key:
+            sudo apt-get update
+            sudo apt-get install ca-certificates curl
+            sudo install -m 0755 -d /etc/apt/keyrings
+            sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+            sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+            # Add the repository to Apt sources:
+            echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+
+        1. 安装 Docker 软件包（最新版本）
+                sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+                sudo apt-get install docker-ce                 docker-ce-cli                containerd.io docker-buildx-plugin docker-compose-plugin
+        2. 安装 Docker 软件包（指定版本）
+            查看docker版本
+                apt-cache madison docker-ce | awk '{ print $3 }'
+            安装指定版本docker
+                VERSION_STRING=5:20.10.24~3-0~ubuntu-focal
+                sudo apt-get install docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
+            查看安装结果
+                docker info
+
+        通过运行镜像来验证Docker Engine安装是否成功 hello-world。
+            sudo docker run hello-world
+
+    要使用 systemd 在其他 Linux 发行版上自动启动 Docker 和 Containerd，请运行以下命令：
+        sudo systemctl enable docker.service
+        sudo systemctl enable containerd.service
+    要停止此行为，请disable改为使用
+        sudo systemctl disable docker.service
+        sudo systemctl disable containerd.service
+
+    默认情况下，只有root用户和docker组的用户才能运行Docker命令。我们可以将当前用户添加到docker组，以避免每次使用Docker时都需要使用sudo
+        sudo usermod -aG docker $USER
+    启动
+        sudo systemctl start docker
+    安装工具
+        sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+    重新加载配置
+        systemctl daemon-reload
+    重启 
+        sudo service docker restart
+    设置完 用户组 添加 到 docker 后需要 重启 系统
+        sudo reboot
+
+设置 docker images 下载源
+    cd /etc/docker
+    sudo vim daemon.json
+    然后将以下配置 源 写入 daemon.json 文件中
+        // Docker中国区官方镜像
+        // https://registry.docker-cn.com
+        // 网易
+        // http://hub-mirror.c.163.com
+        // ustc 中国科技大学
+        // https://docker.mirrors.ustc.edu.cn
+        // 阿里云容器 服务（阿里云得到的是一个专属的加速链接）
+        // https://cr.console.aliyun.com/
+        // "https://15laodr8.mirror.aliyuncs.com"
+        //
+        // 常见错误：添加的镜像源不可用，比如中科大USTC的docker镜像源不给外面人用，所以大家务必验证镜像源的可用性！
+        {
+            "registry-mirrors": ["https://cr.console.aliyun.com/"]
+        }
+    配置完 源后 需要 刷新下配置，并重启 docker 服务
+        sudo systemctl daemon-reload
+        sudo systemctl restart docker
+
+测试 nginx 镜像
+    1. 查询 仓库中的  nginx images 版本
+        sudo docker search nginx
+    2. 找个 star 数量最大 的下载 (指定版本)
+        sudo docker pull nginx:1.15.11
+
+    /var/lib/docker目录
+        每个镜像层包括一个或多个文件，这些文件存储在/var/lib/docker目录下的特定目录结构中。Docker会将下载的镜像层保存在这个目录中，以供后续的容器构建和运行使用
+
+    3. 宿主机 创建文件 准备挂载到 启动的nginx 容器中
+        # 创建挂载文件目录
+        mkdir -p /home/ubuntu/dockerDir/project01/nginx/conf
+        mkdir -p /home/ubuntu/dockerDir/project01/nginx/log
+        mkdir -p /home/ubuntu/dockerDir/project01/nginx/html
+
+    4. 启动 nginx 容器
+        docker run --name nginx -p 9001:80 -d nginx
+        /*
+            输入 “docker ps” 命令：
+            CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+            d1497c555513   nginx     "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   0.0.0.0:9001->80/tcp, :::9001->80/tcp   nginx
+        */
+ 
+    5. 容器中的nginx.conf文件和conf.d文件夹复制到宿主机 
+        docker cp nginx:/etc/nginx/nginx.conf /home/ubuntu/dockerDir/project01/nginx/conf/nginx.conf
+        docker cp nginx:/etc/nginx/conf.d /home/ubuntu/dockerDir/project01/nginx/conf/conf.d
+        docker cp nginx:/usr/share/nginx/html /home/ubuntu/dockerDir/project01/nginx/
+
+    6. 重新启动 新的 nginx 容器
+        docker run -d \
+            -p 9002:80 \
+            --name nginx1.15.11 \
+            --privileged=true \
+            -v /home/ubuntu/dockerDir/project01/nginx/conf/nginx.conf:/etc/nginx/nginx.conf \
+            -v /home/ubuntu/dockerDir/project01/nginx/conf/conf.d:/etc/nginx/conf.d \
+            -v /home/ubuntu/dockerDir/project01/nginx/log:/var/log/nginx \
+            -v /home/ubuntu/dockerDir/project01/nginx/html:/usr/share/nginx/html \
+            nginx:1.15.11
+        
+    7. 在 外部intel网上 能够访问的话，还需要 在 服务器管理后台 配置 协议规则，开放所有端口 之类的。
+        这里以 腾讯云为例：
+            在 腾讯云 里 “控制台”->“服务器” 选中 对应的服务器，然后 在 上面标签页中找到 “防火墙” 一栏选中，
+            在 防火墙 界面中 点击 “添加规则” 按钮，
+                应用类型： 自定义
+                来源    ： 全部 IPv4地址
+                协议    : TCP
+                端口    ：ALL
+                策略    ：允许
+                备注    ：描述信息
+
+    8. 服务器管理后台 配置好 协议规则后，就可以 在 外部intel网上 访问了，打开 一个浏览器 输入如下地址：
+        http://159.75.111.29:9002/
+        回车后，将显示 Nginx 的web页面
+
+    9. 也可以用  使用 curl 命令进行查看，终端中输入命令：
+        curl http://159.75.111.29:9002/
+
+    10. 对 html 内容 进行修改
+        vim /home/ubuntu/dockerDir/project01/nginx/html/index.html
+    
+    11. 再次 再浏览器中 输入 http://159.75.111.29:9002/ 即可 看到 修改的结果
+
+
+测试 redis 数据库：
+    1. 查询仓库redis版本
+        sudo docker search redis
+    2. 使用 star 最多的
+        sudo docker pull redis:5.0.14
+    3. 创建 redis 项目目录，命令如下：
+        mkdir /home/ubuntu/dockerDir/project01/redis
+        redis
+        ├── docker-compose.yaml
+        └── redis
+            ├── data
+            ├── logs
+            └── redis.conf
+
+    4. 编写 redis.conf 文件
+        appendonly yes
+        port 26381
+        appendfilename appendonly.aof
+        appendfsync everysec
+        auto-aof-rewrite-min-size 10M
+        auto-aof-rewrite-percentage 100
+        requirepass "Redis1234."
+        
+        masterauth "Redis1234." 
+        replica-read-only no
+
+
+    5.1 使用 docker run 启动 redis 服务
+        docker run -d \
+            -p 26379:6379 \
+            --name redis5.0.14 \
+            --privileged=true \
+            -v /home/ubuntu/dockerDir/project01/redis/redis/redis.conf:/etc/redis/redis.conf \
+            -v /home/ubuntu/dockerDir/project01/redis/redis/data:/data \
+            -v /home/ubuntu/dockerDir/project01/redis/redis/logs:/logs \
+            redis:5.0.14 \
+            redis-server /etc/redis/redis.conf --appendonly yes --requirepass "Redis1234."
+
+        启动 redis 服务后，就可以 在 外部机器上使用 这个服务，如在 windows 机器上使用，打开 控制台 输入如下命令：
+            redis-cli.exe -h 159.75.111.29 -p 26379 -a Reids1234.
+            这样就可以连接上 发布的这个 redis 服务
+                执行一条命令
+                set a b
+        然后，进入 docker里的 redis5.0.14 容器中，尝试 使用 get 命令 读出 “a” 的值，使用 docker exec 命令：
+            docker exec -it redis5.0.14 /bin/bash
+            进入容器后，使用  redis-cli 程序 同样 的  登录 进 redis数据库
+                redis-cli -a Redis1234.
+                然后 使用 “get a” 命令 ，可以读出 “a” 的 值，输入：
+                get a
+
+    5.2 编写 docker-compose.yaml 文件
+        version: '3.8'
+        services:
+        redis:
+            # 镜像名称以及版本号
+            image: redis:5.0.14
+            # 失败后总是重启
+            restart: always
+            # 设置网络模式为host
+            network_mode: host
+            # 自定义容器名
+            container_name: docker_redis
+            # 文件夹以及文件映射
+            volumes:
+            # 本地数据目录:docker数据目录
+            - /home/ubuntu/dockerDir/project01/redis/redis/data:/data
+            # 注意这里需要先新建redis.conf文件，ro:docker容器对该文件只读，默认是rw可读可写
+            - /home/ubuntu/dockerDir/project01/redis/redis/redis.conf:/etc/redis/redis.conf:ro
+            - /home/ubuntu/dockerDir/project01/redis/redis/logs:/logs
+            # 以配置文件的方式启动 redis.conf
+            command: redis-server /etc/redis/redis.conf
+
+
+测试 mysql 数据库：
+    1. 查询仓库 mysql 版本
+        sudo docker search mysql
+    2. 使用 star 最多的
+        sudo docker pull mysql:5.7.26
+    3. 创建 mysql 项目目录，命令如下：
+        1. 创建前的持久化文件（中文字符编码）相关配置
+            1. 在宿主机里（也就是linux系统里）创建my.cnf文件（为了解决中文乱码问题），
+                我把文件放在了 "/home/ubuntu/dockerDir/project01/mysql/mysql/conf" 路径下，这里你可以自由选择
+                mkdir -p /home/ubuntu/dockerDir/project01/mysql/mysql/conf
+            2. 创建 my.cnf 文件（/home/ubuntu/dockerDir/project01/mysql/mysql/conf/my.cnf）
+                vim my.cnf
+                写入以下内容：
+                    [client]
+                    default_character_set=utf8mb4
+                    [mysqld]
+                    collation_server=utf8mb4_general_ci
+                    character_set_server=utf8mb4
+        2. 创建 数据目录 及 日志目录
+            mkdir -p /home/ubuntu/dockerDir/project01/mysql/mysql/data
+            mkdir -p /home/ubuntu/dockerDir/project01/mysql/mysql/log
+            mkdir -p /home/ubuntu/dockerDir/project01/mysql/mysql/files
+        3. 最终结构如下
+            mysql
+            └── mysql
+                ├── conf
+                │   └── my.cnf
+                ├── data
+                ├── files
+                └── log
+
+    4. docker run 启动 mysql
+        docker run -d \
+            -p 23306:3306 \
+            --name mysql5.7.26 \
+            --privileged=true \
+            -v /home/ubuntu/dockerDir/project01/mysql/mysql/log:/var/log/mysql \
+            -v /home/ubuntu/dockerDir/project01/mysql/mysql/data:/var/lib/mysql \
+            -v /home/ubuntu/dockerDir/project01/mysql/mysql/conf:/etc/mysql/conf.d \
+            -v /home/ubuntu/dockerDir/project01/mysql/mysql/files:/var/lib/mysql-files \
+            -e MYSQL_ROOT_PASSWORD=Mysql1234. \
+            mysql:5.7.26
+        
+        /* 参数说明
+        --name mysql5.7.26:
+            为容器指定一个名称，这里是 mysql5.7.26
+        --privileged=true:
+            赋予容器更多的权限。在一般情况下，尽量避免使用 --privileged，因为它会赋予容器更多的权限，可能会带来一些安全风险。
+        -v /home/ubuntu/dockerDir/project01/mysql/mysql/log:/var/log/mysql:
+            将主机上的 /home/ubuntu/dockerDir/project01/mysql/mysql/log 目录映射到容器内的 /var/log/mysql，用于存储MySQL的日志文件。
+        -v /home/ubuntu/dockerDir/project01/mysql/mysql/data:/var/lib/mysql:
+            将主机上的 /app/mysql8/data 目录映射到容器内的 /var/lib/mysql，用于持久化存储MySQL的数据。
+        -v /home/ubuntu/dockerDir/project01/mysql/mysql/conf:/etc/mysql/conf.d:
+            将主机上的 /app/mysql8/conf 目录映射到容器内的 /etc/mysql/conf.d，用于提供自定义的MySQL配置文件。
+        -v /home/ubuntu/dockerDir/project01/mysql/mysql/files:/var/lib/mysql-files:
+            将主机上的 /app/mysql8/files 目录映射到容器内的 /var/lib/mysql-files，用于存储MySQL的文件。
+        -e MYSQL_ROOT_PASSWORD=Mysql1234.:
+            设置MySQL root用户的密码为 Mysql1234.
+        -d: 后台运行容器。
+        */
+
+    5. 使用 docker exec 进入 mysql5.7.26 容器中
+        docker exec -it mysql5.7.26 /bin/bash
+    6. 进入 mysql5.7.26 容器后，登录进 mysql，输入:
+        mysql -uroot -p 
+            根据提示 输入 密码 即可进入 mysql 数据库终端
+        查看 默认数据 “mysql” 下的 表 “user” 的内容
+            select * from mysql.user
+            输出 如下（最后一行结果，其中 “User”字段下的，“root” 值对应的 “Host”字段值 为 “%”，则表明 外部使用 IP+端口可以直接访问）：
+                +-----------+---------------+-------------+-------------+-------------+-------------+-------------+-----------+-------------+---------------+--------------+-----------+------------+-----------------+------------+------------+--------------+------------+-----------------------+------------------+--------------+-----------------+------------------+------------------+----------------+---------------------+--------------------+------------------+------------+--------------+------------------------+----------+------------+-------------+--------------+---------------+-------------+-----------------+----------------------+-----------------------+-------------------------------------------+------------------+-----------------------+-------------------+----------------+
+                | Host      | User          | Select_priv | Insert_priv | Update_priv | Delete_priv | Create_priv | Drop_priv | Reload_priv | Shutdown_priv | Process_priv | File_priv | Grant_priv | References_priv | Index_priv | Alter_priv | Show_db_priv | Super_priv | Create_tmp_table_priv | Lock_tables_priv | Execute_priv | Repl_slave_priv | Repl_client_priv | Create_view_priv | Show_view_priv | Create_routine_priv | Alter_routine_priv | Create_user_priv | Event_priv | Trigger_priv | Create_tablespace_priv | ssl_type | ssl_cipher | x509_issuer | x509_subject | max_questions | max_updates | max_connections | max_user_connections | plugin                | authentication_string                     | password_expired | password_last_changed | password_lifetime | account_locked |
+                +-----------+---------------+-------------+-------------+-------------+-------------+-------------+-----------+-------------+---------------+--------------+-----------+------------+-----------------+------------+------------+--------------+------------+-----------------------+------------------+--------------+-----------------+------------------+------------------+----------------+---------------------+--------------------+------------------+------------+--------------+------------------------+----------+------------+-------------+--------------+---------------+-------------+-----------------+----------------------+-----------------------+-------------------------------------------+------------------+-----------------------+-------------------+----------------+
+                | localhost | root          | Y           | Y           | Y           | Y           | Y           | Y         | Y           | Y             | Y            | Y         | Y          | Y               | Y          | Y          | Y            | Y          | Y                     | Y                | Y            | Y               | Y                | Y                | Y              | Y                   | Y                  | Y                | Y          | Y            | Y                      |          |            |             |              |             0 |           0 |               0 |                    0 | mysql_native_password | *55A37621D30AF4A9BE038A8075148EB6BC9903F7 | N                | 2024-03-16 20:30:39   |              NULL | N              |
+                | localhost | mysql.session | N           | N           | N           | N           | N           | N         | N           | N             | N            | N         | N          | N               | N          | N          | N            | Y          | N                     | N                | N            | N               | N                | N                | N              | N                   | N                  | N                | N          | N            | N                      |          |            |             |              |             0 |           0 |               0 |                    0 | mysql_native_password | *THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE | N                | 2024-03-16 20:30:34   |              NULL | Y              |
+                | localhost | mysql.sys     | N           | N           | N           | N           | N           | N         | N           | N             | N            | N         | N          | N               | N          | N          | N            | N          | N                     | N                | N            | N               | N                | N                | N              | N                   | N                  | N                | N          | N            | N                      |          |            |             |              |             0 |           0 |               0 |                    0 | mysql_native_password | *THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE | N                | 2024-03-16 20:30:34   |              NULL | Y              |
+                | %         | root          | Y           | Y           | Y           | Y           | Y           | Y         | Y           | Y             | Y            | Y         | Y          | Y               | Y          | Y          | Y            | Y          | Y                     | Y                | Y            | Y               | Y                | Y                | Y              | Y                   | Y                  | Y                | Y          | Y            | Y                      |          |            |             |              |             0 |           0 |               0 |                    0 | mysql_native_password | *55A37621D30AF4A9BE038A8075148EB6BC9903F7 | N                | 2024-03-16 20:30:39   |              NULL | N              |
+                +-----------+---------------+-------------+-------------+-------------+-------------+-------------+-----------+-------------+---------------+--------------+-----------+------------+-----------------+------------+------------+--------------+------------+-----------------------+------------------+--------------+-----------------+------------------+------------------+----------------+---------------------+--------------------+------------------+------------+--------------+------------------------+----------+------------+-------------+--------------+---------------+-------------+-----------------+----------------------+-----------------------+-------------------------------------------+------------------+-----------------------+-------------------+----------------+
+                4 rows in set (0.00 sec)
+    7. “show databases;” SQL语句可以查看当前mysql连接里有哪些数据库，以下四个是安装 mysql 时默认自带的 四个数据库，如下：
+                +--------------------+
+                | Database           |
+                +--------------------+
+                | information_schema |
+                | mysql              |
+                | performance_schema |
+                | sys                |
+                +--------------------+
+                4 rows in set (0.00 sec)
+
+    8. 创建数据库(名为：“testdb240317”)和数据，测试使用
+        CREATE DATABASE IF NOT EXISTS testdb240317;
+        USE testdb240317;
+        CREATE TABLE IF NOT EXISTS users (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            username VARCHAR(50) NOT NULL,
+            email VARCHAR(100) NOT NULL
+        );
+        INSERT INTO users (username, email) VALUES
+            ('alice_white', 'alice@example.com'),
+            ('charlie_brown', 'charlie@example.com'),
+            ('emma_jones', 'emma@example.com');
+        select * from users;
+        INSERT INTO users (username, email) VALUES
+            ('张三', 'alice@example.com'),
+            ('啊我二姨无语', 'charlie@example.com'),
+            ('李四', 'emma@example.com');
+        select * from users;
+
+    9. 外部网络机器上测试连接，在windows机器上，使用 “Navicat Premium 16” 建立连接。
+        点击 “文件” -> “新建连接” -> “MySQL...”
+        在 弹出的 对话框界面中，输入：
+            连接名  ：自己随便起名
+            主机    ：159.75.111.29
+            端口    ：23306
+            用户名  ：root
+            密码    ：Mysql1234.

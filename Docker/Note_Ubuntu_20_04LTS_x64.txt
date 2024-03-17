@@ -204,28 +204,37 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
         mkdir -p /home/ubuntu/dockerDir/project01/nginx/html
 
     4. 启动 nginx 容器
-        docker run --name nginx -p 9001:80 -d nginx
+        docker run --name tmp-nginx -p 9001:80 -d nginx
         /*
             输入 “docker ps” 命令：
-            CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                                   NAMES
-            d1497c555513   nginx     "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   0.0.0.0:9001->80/tcp, :::9001->80/tcp   nginx
+            CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+            d1497c555513   tmp-nginx  "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   0.0.0.0:9001->80/tcp, :::9001->80/tcp   nginx
         */
  
-    5. 容器中的nginx.conf文件和conf.d文件夹复制到宿主机 
-        docker cp nginx:/etc/nginx/nginx.conf /home/ubuntu/dockerDir/project01/nginx/conf/nginx.conf
-        docker cp nginx:/etc/nginx/conf.d /home/ubuntu/dockerDir/project01/nginx/conf/conf.d
-        docker cp nginx:/usr/share/nginx/html /home/ubuntu/dockerDir/project01/nginx/
+    5. 容器中的nginx.conf文件和conf.d文件夹复制到宿主机，然后删除 tmp-nginx 容器
+        // 可以全部考出来 如输入命令： docker cp tmp-nginx:/etc/nginx /home/ubuntu/dockerDir/nginx_etc_dir
+        // 其实只需要  两个 .conf 文件 就行了：
+        //    /etc/nginx/nginx.conf 
+        //    /etc/nginx/conf.d/default.conf
+
+        docker cp tmp-nginx:/etc/nginx/nginx.conf /home/ubuntu/dockerDir/project01/nginx/conf/nginx.conf
+        docker cp tmp-nginx:/etc/nginx/conf.d /home/ubuntu/dockerDir/project01/nginx/conf/conf.d
+        docker cp tmp-nginx:/usr/share/nginx/html /home/ubuntu/dockerDir/project01/nginx/
+        拷贝完后 删除 tmp-nginx 容器
+            docker stop tmp-nginx
+            docker rm tmp-nginx
 
     6. 重新启动 新的 nginx 容器
-        docker run -d \
-            -p 9002:80 \
+        docker run \
+            -d \
+            -p 9012:80 \
             --name nginx1.15.11 \
             --privileged=true \
             -v /home/ubuntu/dockerDir/project01/nginx/conf/nginx.conf:/etc/nginx/nginx.conf \
             -v /home/ubuntu/dockerDir/project01/nginx/conf/conf.d:/etc/nginx/conf.d \
             -v /home/ubuntu/dockerDir/project01/nginx/log:/var/log/nginx \
             -v /home/ubuntu/dockerDir/project01/nginx/html:/usr/share/nginx/html \
-            nginx:1.15.11
+            nginx:1.15.11 
         
     7. 在 外部intel网上 能够访问的话，还需要 在 服务器管理后台 配置 协议规则，开放所有端口 之类的。
         这里以 腾讯云为例：
@@ -286,8 +295,8 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
             -v /home/ubuntu/dockerDir/project01/redis/redis/redis.conf:/etc/redis/redis.conf \
             -v /home/ubuntu/dockerDir/project01/redis/redis/data:/data \
             -v /home/ubuntu/dockerDir/project01/redis/redis/logs:/logs \
-            redis:5.0.14 \
-            redis-server /etc/redis/redis.conf --appendonly yes --requirepass "Redis1234."
+            redis-server /etc/redis/redis.conf --appendonly yes --requirepass "Redis1234." \
+            redis:5.0.14 
 
         启动 redis 服务后，就可以 在 外部机器上使用 这个服务，如在 windows 机器上使用，打开 控制台 输入如下命令：
             redis-cli.exe -h 159.75.111.29 -p 26379 -a Reids1234.
@@ -365,7 +374,7 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
             -v /home/ubuntu/dockerDir/project01/mysql/mysql/conf:/etc/mysql/conf.d \
             -v /home/ubuntu/dockerDir/project01/mysql/mysql/files:/var/lib/mysql-files \
             -e MYSQL_ROOT_PASSWORD=Mysql1234. \
-            mysql:5.7.26
+             mysql:5.7.26 
         
         /* 参数说明
         --name mysql5.7.26:
@@ -387,9 +396,11 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
 
     5. 使用 docker exec 进入 mysql5.7.26 容器中
         docker exec -it mysql5.7.26 /bin/bash
-    6. 进入 mysql5.7.26 容器后，登录进 mysql，输入:
-        mysql -uroot -p 
+    6. 进入 mysql5.7.26 容器后，登录进 mysql，输入 mysql的 账号和密码 进入mysql控制窗口:
+        mysql -u root -p 
             根据提示 输入 密码 即可进入 mysql 数据库终端
+        在容器mysql里查看前面的中文 utf8mb4 编码配置成功没，输入命令：
+            show variables like 'character%';
         查看 默认数据 “mysql” 下的 表 “user” 的内容
             select * from mysql.user
             输出 如下（最后一行结果，其中 “User”字段下的，“root” 值对应的 “Host”字段值 为 “%”，则表明 外部使用 IP+端口可以直接访问）：
@@ -440,3 +451,168 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
             端口    ：23306
             用户名  ：root
             密码    ：Mysql1234.
+
+    10. 重启 mysql 服务
+        service mysql restart
+
+测试 php 服务
+    1. 查询仓库 php 版本
+        sudo docker search php
+    2. 使用 star 最多的
+        sudo docker pull php:7.3.4-fpm
+    3. 创建 php 项目目录，后面 会将 laravel的打包的web放到 这个文件夹中，命令如下：
+        mkdir -p /home/ubuntu/dockerDir/project01/php/www
+    4. 创建并启动 php 容器
+        docker run -d \
+            -p 9000:9000 \
+            --name php7.3.4fpm \
+            -v /home/ubuntu/dockerDir/project01/php/www:/var/www/html \
+            php:7.3.4-fpm
+
+        以上 命令 说明：
+            -p      将容器的9000端口映射到主机的9000端口
+            -d      后台运行(守护进程)
+            —name   将容器命名为 php7.3.4fpm
+            -v      将主机中当前目录下的 /home/ubuntu/dockerDir/project01/php/www 挂载到容器的 /usr/share/nginx/www 目录
+
+    4. 启动一个 新的 nginx 容器
+        docker run -d \
+            -p 9001:80 \
+            --name nginx1.15.11_php \
+            --privileged=true \
+            -v /home/ubuntu/dockerDir/project01/nginx_php/conf/nginx.conf:/etc/nginx/nginx.conf \
+            -v /home/ubuntu/dockerDir/project01/nginx_php/conf/conf.d:/etc/nginx/conf.d \
+            -v /home/ubuntu/dockerDir/project01/nginx_php/log:/var/log/nginx \
+            -v /home/ubuntu/dockerDir/project01/php/www:/usr/share/nginx/html \
+            --link php7.3.4fpm:php-svr \
+            nginx:1.15.11
+
+    5. 修改 default.conf 配置文件，使用 vim 打开文件：
+        vim /home/ubuntu/dockerDir/project01/nginx_php/conf/nginx.conf
+        主要修改 两个地方，
+            location / {
+                # root   /usr/share/nginx/html;
+                # root   /usr/share/nginx/html/LaravelVuex01/public;
+                root /usr/share/nginx/html/xyzwweb01/public;                    # 修改 为 laravel打包好的 public 文件夹所在目录
+                index  index.php index.html index.htm;                          # 加入 "index"属性值中 加入 “index.php”
+                try_files $uri $uri/ /index.php?$query_string;                  # 配置伪静态
+            }
+            ......
+            location ~ \.php$ {
+                # fastcgi_pass   159.75.111.29:9000;                            # 配置 php 服务地址 和 端口（不用服务名，也可以直接填写 php服务的 IP）
+                fastcgi_pass   php-svr:9000;                                    # 配置 php 服务地址 和 端口（上面取的php服务名“--link php7.3.4fpm:php-svr”）
+                fastcgi_index  index.php;
+                # fastcgi_param  SCRIPT_FILENAME  /var/www/html/LaravelVuex01/public$fastcgi_script_name;
+                fastcgi_param  SCRIPT_FILENAME  /var/www/html/xyzwweb01/public$fastcgi_script_name;         # 这里 也需要做相应修改 和 “root” 属性值 是一个目录（只不是映射的目录名不同）
+                fastcgi_param  SCRIPT_NAME      $fastcgi_script_name;
+                include        fastcgi_params;
+            }
+
+    5. 在php容器中，安装 php扩展 redis
+        我用的是 源码安装 方式，我的windows的Redis版本是5.0.14的 在 https://pecl.php.net 中没找到，就下载的 redis-5.0.2.tgz
+
+        *** docker PHP 安装 Redis 扩展
+            1. 方式一（和 方式二 pecl安装 差不多）：
+                1. 进入容器
+                    docker exec -it 你的容器名称 /bin/bash
+                2. 安装 redis 扩展
+                    pecl install -o -f redis && rm -rf /tmp/pear && docker-php-ext-enable redis
+                3. 重启容器
+                    docker restart php7
+            2. 方式二：pecl安装
+                docker exec -it php bash                #进入容器
+                php -m                                  #查看是不是有redis扩展
+                pecl seach redis                        #检索 redis 扩展
+                pecl install redis                      #安装
+                docker-php-ext-enable redis.so          #安装完成将 redis.so 文件加入到配置文件
+                php -m                                  #查看 redis 扩展就有了
+            3. 方式三：源码安装
+                1.redis扩展下载地址 https://pecl.php.net
+                    wget https://pecl.php.net/get/redis-5.0.2.tgz
+                2.解压redis扩展包
+                    tar -zxvf redis-5.0.2.tgz
+                3.复制安装包到容器内部
+                    docker cp /home/redis-5.0.2 php:/usr/src/php/ext/redis
+                4.进入容器
+                    docker exec -it php bash
+                5.查看扩展是否复制进入容器
+                    cd /usr/src/php/ext/redis
+                6.安装
+                    docker-php-ext-install redis
+                7.查看  
+                    php -m
+            4. 方式四（使用Dockerfile）：
+                使用 Dockfile 安装 php 的 redis 扩展
+                    FROM php:7.4-fpm
+                    RUN pecl install redis \
+                        && docker-php-ext-enable redis
+                    docker build -t myphp .
+                    
+                    上面命令的作用：
+                        从php:7.4-fpm镜像构建您的容器。
+                        然后，使用pecl命令安装redis扩展，
+                        并使用docker-php-ext-enable命令启用该扩展。
+                        最后，使用 "docker build" 命令构建您的镜像
+
+    6. 在 php容器中，还有个 mysql 的扩展需要打开
+        如下命令（已经有的就不用装了）： 
+            docker-php-ext-install pdo pdo_mysql 安装 pdo_mysql 扩展
+        进入 php容器后，输入 命令 “php -m” 后，
+        发现 已经有 pdo_mysql, mysqli 并 已经是开启状态，所以这里就不再单独安装了
+
+    7. 在外部intel机器上，打开浏览器 输入 :
+        http://159.75.111.29:9001/complex-table
+        可以查看到 
+        我们 发布的 laravel 的 后台web界面了
+
+
+测试 node 服务
+    1. 查询仓库 node 版本
+        sudo docker search node
+    2. 使用 star 最多的
+        sudo docker pull node:16.19.0
+    3. 创建 node 项目目录，后面 会将 XyzwTool 打包好的 build文件夹 放到 这个文件夹中，命令如下：
+        mkdir /home/ubuntu/dockerDir/project01/node/test_prj01
+            test_prj01
+            ├── build_V007                      // build.zip 解压出来的 
+            ├── build.zip                       // XyzwTool 项目 打包好的 js 压缩包，运行 里面的 app.js 即可
+            ├── node_modules                    // node_modules.zip 解压出来的
+            ├── node_modules.zip                // XyzwTool 项目 的依赖 模块 的压缩包
+            └── RoleInfo                        // 存放 “node app.js” 程序运行后 输出的 账号角色信息
+
+        
+    4. 创建并启动 node 容器，使用 “-it” 不用后台启动，直接进入 启动后的容器中：
+        我这里用的 方法一 启动的 node 容器
+        
+        方法一：
+            docker run -it \
+                --name node-self01 \
+                --privileged=true \
+                -v /home/ubuntu/dockerDir/project01/node/test_prj01:/app/test_prj01 \
+                node:16.19.0 \
+                /bin/bash
+        方法二：
+            使用 Dockerfile 来启动 node 容器：
+                1. 编写 Dockerfile 文件，写入下面内容：
+                    # 使用官方Node.js运行时基础镜像
+                    FROM node:16.19.0
+                    
+                    # 设置工作目录为/app
+                    WORKDIR /app/test_prj01
+                    
+                    # 将当前目录下的所有文件复制到容器的/app目录
+                    # COPY . /app/test_prj01
+                    VOLUME 
+                    
+                    # 设置环境变量，指定运行node程序的命令
+                    CMD ["node", "app.js"]
+                2. 创建你的 app.js 文件，并保存在 Dockerfile 文件相同目录下
+                3. 在包含 Dockerfile 和 app.js 文件的目录中运行以下命令来构建和运行Docker容器
+                    docker build -t node-app .
+                    docker run --rm -it node-app
+                    这将创建一个名为node-app的Docker镜像，并在容器中运行你的 app.js 文件。
+                    如果你需要在容器中打开一个交互式shell，可以使用
+                        docker run --rm -it node-app
+                    命令，它将启动一个新的容器并让你能够与其交互
+
+

@@ -1,3 +1,11 @@
+// 查看 linux 内核版本
+uname -a
+    Linux VM-24-11-ubuntu 5.4.0-171-generic #189-Ubuntu SMP Fri Jan 5 14:23:02 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+
+// 查看 ubuntu 版本
+cat /proc/version
+    Linux version 5.4.0-171-generic (buildd@lcy02-amd64-005) (gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2)) #189-Ubuntu SMP Fri Jan 5 14:23:02 UTC 2024
+
 ls 命令：
     列出当前文件夹中以字母"a"开头的所有文件和文件夹：
         ls a*
@@ -23,9 +31,15 @@ docker run \
 docker exec -it 容器名|容器ID /bin/bash
 
 // 查看 当前  docker 里所有的 容器的详细信息
-docker ps -a --no-trunc
-docker inspect 容器ID
-docker inspect -f '{{.Config.Image}}' 容器ID
+    docker ps -a --no-trunc
+    docker inspect 容器ID
+    docker inspect -f '{{.Config.Image}}' 容器ID
+// 查看容器 IP 信息
+    docker inspect 容器ID | grep "IPAddress"
+// 重启容器
+    docker restart 容器ID
+// 实时地跟踪容器的标准输出，可以使用-f或--follow选项
+    docker logs -f <container_id_or_name>
 
 docker查看容器进程命令
     docker ps
@@ -42,3 +56,19 @@ docker查看容器进程命令
         命令可以查看所有容器的进程列表，类似于Linux的top命令，可以按照CPU、内存等指标进行排序和过滤。
 
     注意：以上命令均需在Docker主机上执行。
+
+
+unzip -o xyzwweb.zip -d ./xyzwweb01
+    -d [目标目录]：指定解压到的目标目录，默认为当前目录。
+    -o：覆盖已存在的文件。
+    -q：静默模式，不显示解压过程。
+    -j：仅解压文件，不包括目录结构
+
+tree -L 3 -I "node_modules"
+    tree -d 只显示文件夹；
+    tree -L n 显示项目的层级。n表示层级数。比如想要显示项目三层结构，可以用tree -l 3；
+    tree -I pattern 用于过滤不想要显示的文件或者文件夹。比如你想要过滤项目中的node_modules文件夹，可以使用tree -I "node_modules"；
+    tree > tree.md 将项目结构输出到tree.md这个文件
+
+重启 nginx 服务
+    service nginx reload

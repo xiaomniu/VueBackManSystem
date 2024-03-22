@@ -1,4 +1,19 @@
-本机： Ubuntu 20.04 LTS (GNU/Linux 5.4.0-171-generic x86_64)
+本机(159.75.111.29)： Ubuntu 20.04 LTS (GNU/Linux 5.4.0-171-generic x86_64)
+查看本机信息：
+1. 使用lsb_release命令：
+    lsb_release -a
+2. 查看/etc/issue文件：
+    cat /etc/issue
+3. 查看/etc/os-release文件
+    cat /etc/os-release
+4. 使用hostnamectl命令（这个命令通常用于设置系统的主机名，但也可以用来查询系统信息）：
+    hostnamectl
+
+Debian 10（Buster）的下载源示例：
+    deb http://mirrors.aliyun.com/debian/ buster main non-free contrib
+    deb-src http://mirrors.aliyun.com/debian/ buster main non-free contrib
+    deb http://mirrors.aliyun.com/debian-security/ buster/updates main non-free contrib
+    deb-src http://mirrors.aliyun.com/debian-security/ buster/updates main non-free contrib
 
 sudo apt-get update
     这个命令，会访问源列表里的每个网址，并读取软件列表，然后保存在本地电脑。我们在新立得软件包管理器里看到的软件列表，都是通过update命令更新的。

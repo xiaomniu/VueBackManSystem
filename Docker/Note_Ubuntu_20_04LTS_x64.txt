@@ -639,6 +639,7 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
                 --name node-self01 \
                 --privileged=true \
                 -v /home/ubuntu/dockerDir/project01/node/node_prj:/app/node_prj \
+                -e LANG=C.UTF-8 \
                 node:16.19.0 \
                 /bin/bash
 

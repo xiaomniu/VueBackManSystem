@@ -1,3 +1,31 @@
+CONTAINER ID   IMAGE           COMMAND                  CREATED        STATUS                      PORTS               
+866e3f1dcd58   redis:5.0.14    "docker-entrypoint.s…"   2 hours ago    Up About a minute           0.0.0.0:26379->6379/
+308431c4a6aa   node:16.19.0    "docker-entrypoint.s…"   13 hours ago   Exited (0) 31 minutes ago                       
+ff22af51669a   node:16.19.0    "docker-entrypoint.s…"   14 hours ago   Exited (0) 14 hours ago                         
+682f8bf95e88   php:7.3.4-fpm   "docker-php-entrypoi…"   20 hours ago   Exited (0) 12 minutes ago                       
+f932f1bca363   nginx:1.15.11   "nginx -g 'daemon of…"   21 hours ago   Exited (0) 12 minutes ago                       
+881df6169f41   mysql:5.7.26    "docker-entrypoint.s…"   39 hours ago   Exited (0) 12 minutes ago                       
+
+docker start 881df6169f41 && docker start 866e3f1dcd58 && docker start f932f1bca363 && docker start 682f8bf95e88
+
+
+// 修改 root 密码，目前 修改为了：Qwer1234.
+sudo passwd root
+
+// 腾讯云 使用 root 登录 ubuntu
+    1. 使用具有 sudo 权限的用户登录后，执行以下命令以获取 root 权限
+        sudo -i
+            sudo -i是Linux终端命令下改变用户对命令使用权限的命令。
+            在使用ubuntu系统时，刚安装的Ubuntu系统无法登陆到root用户，可以使用sudo - i命令进入root用户下使用passwd改变root用户密码。
+    2. 如果你需要通过 SSH 使用 root 用户登录，你需要先为 root 用户设置密码：
+        sudo passwd root
+    3. 修改 SSH 配置文件 /etc/ssh/sshd_config，找到 PermitRootLogin 选项，并将其修改为 yes ：
+        vim /etc/ssh/sshd_config
+        找到 “PermitRootLogin”，将其 修改为 “PermitRootLogin yes”
+    4. 重启 SSH 服务以应用更改：
+        sudo service ssh restart
+
+
 // 查看 linux 内核版本
 uname -a
     Linux VM-24-11-ubuntu 5.4.0-171-generic #189-Ubuntu SMP Fri Jan 5 14:23:02 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
@@ -58,11 +86,16 @@ docker查看容器进程命令
     注意：以上命令均需在Docker主机上执行。
 
 
+rm -r --exclude-dir=folder1 --exclude-dir=folder2 /path/to/directory/*
+    删除文件 排除哪些文件
+    
+
 unzip -o xyzwweb.zip -d ./xyzwweb01
     -d [目标目录]：指定解压到的目标目录，默认为当前目录。
     -o：覆盖已存在的文件。
     -q：静默模式，不显示解压过程。
     -j：仅解压文件，不包括目录结构
+tar zxvf 文件名.tgz -C /指定路径
 
 tree -L 3 -I "node_modules"
     tree -d 只显示文件夹；
@@ -72,3 +105,4 @@ tree -L 3 -I "node_modules"
 
 重启 nginx 服务
     service nginx reload
+

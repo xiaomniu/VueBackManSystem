@@ -106,3 +106,9 @@ tree -L 3 -I "node_modules"
 重启 nginx 服务
     service nginx reload
 
+
+mysql数据库备份与还原
+mysqldump -h 127.0.0.1 -u root -p xyzwinvite > xyzwinvite240328001.sql
+
+// 查看文件夹大小
+du . -h --max-depth=1

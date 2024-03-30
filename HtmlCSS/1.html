@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+</head>
+
+<body>
+    <div class="flex flex-row justify-start">
+        <div class="flex flex-col bg-blue-300 w-[600px] h-[900px]">
+            <label class="m-2"> Post Url </label>
+            <input class="m-2 border-2 rounded-full" type="text" value="">
+            <label class="m-2"> Request Data </label>
+            <textarea class="m-2 border-2 rounded-lg" name="" id="" cols="30" rows="10"></textarea>
+            <label class="m-2"> Request Data </label>
+            <textarea class="m-2 border-2 rounded-md" cols="30" rows="10"></textarea>
+            <button type="button" class="m-2  h-10 rounded-lg w-48 border-4 border-blue-500 bg-green-300 text-red-600 text-3xl">
+                Post It
+            </button>
+        </div>
+        <div class="h-[800px] bg-pink-200">
+            <div class="border-2 flex flex-row justify-center items-center m-2">
+                <button class="w-48 h-10 border-2 bg-blue-400 m-2 m-2" type="button"> notice</button>
+                <label class="m-2 m-2"> noticeId</label>
+                <input class="rounded-md border-2 m-2" type="text" value="1">
+            </div>
+            <div class="border-2 flex flex-col m-2">
+                <div class="flex flex-row m-2">
+                    <span class="m-2"> Card Key</span>
+                    <input class="rounded-md border-2 m-2" type="text">
+                </div>
+                <div class="flex flex-row m-2">
+                    <button class="w-48 h-10 m-2 rounded-lg border-blue-500 border-2 bg-red-600"> ⚙ bind 👉 </button>
+                    <span class="m-2">roleId</span>
+                    <input class="rounded-md border-2 m-2" type="text">
+                </div>
+                <div class="flex m-2">
+                    <div class="flex flex-col justify-around">
+                        <button class="w-48 h-10 m-2 rounded-lg border-blue-500 border-2 bg-red-600"> ⚙ refresh 👉 </button>
+                        <button class="w-48 h-10 m-2 rounded-lg border-blue-500 border-2 bg-red-600"> ⚙ batch 👉 </button>
+                        <button class="w-48 h-10 m-2 rounded-lg border-blue-500 border-2 bg-red-600"> ⚙ remove 👉 </button>
+                    </div>
+                    <div>
+                        <img class="m-2" src="https://gimg3.baidu.com/search/src=http%3A%2F%2Fpics6.baidu.com%2Ffeed%2F95eef01f3a292df5bfd91163bee3f26d35a87389.jpeg%40f_auto%3Ftoken%3D428ccc79b7afe95c82a0f1827075a074&refer=http%3A%2F%2Fwww.baidu.com&app=2021&size=f360,240&n=0&g=0n&q=75&fmt=auto?sec=1710867600&t=285f2becadb9fd8de167abb52a15cf5c"
+                            alt="">
+                    </div>
+                </div>
+                <div class="flex flex-row m-2">
+                    <button class="w-48 h-10 m-2 rounded-lg border-blue-500 border-2 bg-red-600"> ⚙ clear_count 👉 </button>
+                    <span class="m-2"> roleId</span>
+                    <input class="rounded-md border-2 m-2" type="text">
+                </div>
+                <div class="flex flex-row m-2">
+                    <button class="w-48 h-10 m-2 rounded-lg border-blue-500 border-2 bg-red-600"> ⚙ auto_batch 👉 </button>
+                    <span class="m-2">roleId</span>
+                    <input class="rounded-md border-2 m-2" type="text">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

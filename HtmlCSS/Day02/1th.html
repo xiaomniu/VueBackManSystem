@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <style>
+        h1{
+            color: red;
+            background-color: lightblue;
+            text-align: center;
+        }
+        span::before{
+            content: "《";
+            color: red;
+        }
+        span::after{
+            content: "》";
+            color: blue;
+        }
+        .red li{
+            color: chocolate;
+        }
+        .red .haha{
+            color: green;
+        }
+        .red>ul>.yiyi{
+            color: rgb(169, 172, 19);
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>第一个 h1 标题</h1>
+        <p>
+            <span>功夫</span>这个电影挺好看
+        </p>
+    </div>
+    <div class="red">
+        <p>Lorem ipsum dolor sit.</p>
+        <ul>
+            <li>Lorem ipsum dolor sit.</li>
+            <li>Sed harum impedit earum!</li>
+            <li class="haha">Dolor hic ratione ea?</li>
+            <li class="yiyi">A sapiente qui dolorem.</li>
+        </ul>
+        <p>Lorem ipsum dolor sit.</p>
+        <p>Maxime iste sequi laboriosam?</p>
+        <p>Cumque assumenda vitae et.</p>
+        <p>Inventore accusamus itaque voluptates.</p>
+    </div>
+</body>
+</html>

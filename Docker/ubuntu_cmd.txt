@@ -89,13 +89,30 @@ docker查看容器进程命令
 rm -r --exclude-dir=folder1 --exclude-dir=folder2 /path/to/directory/*
     删除文件 排除哪些文件
     
-
+解压缩：
 unzip -o xyzwweb.zip -d ./xyzwweb01
     -d [目标目录]：指定解压到的目标目录，默认为当前目录。
     -o：覆盖已存在的文件。
     -q：静默模式，不显示解压过程。
     -j：仅解压文件，不包括目录结构
 tar zxvf 文件名.tgz -C /指定路径
+tar -xvf tardir.tar
+tar -zxvf tardir.tar.gz
+tar -jxvf tardir.tar.bz2
+
+
+压缩：
+    压缩 zipDir 目录时，不压缩 /tmp/zipDir/file3
+        zip -9r /tmp/zipDirWithoutFile3.zip  /tmp/zipDir    -x "/tmp/zipDir/file3"
+    普通压缩：
+        tar -cvf  /tmp/tardir.tar /tmp/tarDir/
+    调用gzip压缩，添加一个-z即可：
+        tar -zcvf tardir.tar.gz tardir.tar
+        tar -czvf folder.tgz /path/to/folder
+        tar -czvf DOCKER-WEB.tgz ./DOCKER-WEB
+    调用bz2压缩
+        tar -jcvf tardir.tar.bz2 tardir.tar
+
 
 tree -L 3 -I "node_modules"
     tree -d 只显示文件夹；

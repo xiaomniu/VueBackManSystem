@@ -714,6 +714,18 @@ Ubuntu使用apt国内源并安装docker（阿里源/清华源）
                     如果你需要在容器中打开一个交互式shell，可以使用
                         docker run --rm -it node-app
                     命令，它将启动一个新的容器并让你能够与其交互
+    5. docker-compose.yaml
+            ```
+            node:
+                image: node:16.19.0
+                restart: always
+                volumes:
+                    - /data/node/:/home/dev_prj
+                environment:
+                    - LANG=C.UTF-8
+                command:
+                    apt-get update && apt-get install screen && screen -S testRunning
+            ```
 
 
 
@@ -723,3 +735,25 @@ docker run -d \
     -v /home/ubuntu/dockerDir/project01/node/test_prj01:/app/test_prj01 \
     node:16.19.0 \
     /bin/bash
+
+docker run -d \
+    --name node-self01 \
+    --privileged=true \
+    -v /xmn_dev/DOCKER-WEB/data/node/:/home/node \
+    node:16.19.0 \
+    /bin/bash && node /home/node/run.js
+
+docker run -d \
+    --name node-self01 \
+    --privileged=true \
+    -v /xmn_dev/DOCKER-WEB/data/node/:/home/node \
+    node:16.19.0 \
+    node /home/node/run.js
+
+    node:
+        image: node:16.19.0
+        restart: always
+        volumes:
+            - /xmn_dev/DOCKER-WEB/data/node/:/home/node
+        environment:
+            - LANG=C.UTF-8

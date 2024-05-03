@@ -1,3 +1,37 @@
+
+CentOS7.6 系统配置国内yum源和epel源
+    1.首先进入/etc/yum.repos.d/目录下，新建一个repo_bak目录，用于保存系统中原来的repo文件
+        cd /etc/yum.repos.d/
+        mkdir repo_bak
+        mv *.repo repo_bak/
+    2.在CentOS中配置使用网易和阿里的开源镜像
+        到网易和阿里开源镜像站点下载系统对应版本的repo文件
+        wget http://mirrors.aliyun.com/repo/Centos-7.repo
+        wget http://mirrors.163.com/.help/CentOS7-Base-163.repo
+            >[root@bogon yum.repos.d]# ls
+            >Centos-7.repo  CentOS-Base-163.repo  repo.bak
+    3.清除系统yum缓存并生成新的yum缓存
+        yum clean all     # 清除系统所有的yum缓存
+        yum makecache     # 生成yum缓存
+    4.安装epel源
+        yum list | grep epel-release
+        yum install -y epel-release
+            >[root@bogon yum.repos.d]# ls            # epel源安装成功，比原来多了一个epel.repo和epel-testing.repo文件
+            >Centos-7.repo  CentOS-Base-163.repo  epel.repo  epel-testing.repo  repo.bak
+    5.使用阿里开源镜像提供的epel源
+        wget -O /etc/yum.repos.d/epel-7.repo http://mirrors.aliyun.com/repo/epel-7.repo    # 下载阿里开源镜像的epel源文件
+            >[root@bogon yum.repos.d]# ls
+            >CentOS7-Base-163.repo  Centos-7.repo  epel-7.repo  epel.repo  epel-testing.repo  repo_bak
+    6.再次清除系统yum缓存，并重新生成新的yum缓存
+        yum clean all     # 清除系统所有的yum缓存
+        yum makecache     # 生成yum缓存
+    7.查看系统可用的yum源和所有的yum源
+        yum repolist enabled
+        yum repolist all  
+    8.更新
+        yum update
+        yum upgrade
+
 centOS7 安装 Docker：
 卸载旧版本：较旧的 Docker 版本称为 docker 或 docker-engine 。如果已安装这些程序，请卸载它们以及相关的依赖项。
     sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine

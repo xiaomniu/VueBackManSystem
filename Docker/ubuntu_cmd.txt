@@ -95,7 +95,7 @@ unzip -o xyzwweb.zip -d ./xyzwweb01
     -o：覆盖已存在的文件。
     -q：静默模式，不显示解压过程。
     -j：仅解压文件，不包括目录结构
-tar zxvf 文件名.tgz -C /指定路径
+tar -zxvf 文件名.tgz -C /指定路径
 tar -xvf tardir.tar
 tar -zxvf tardir.tar.gz
 tar -jxvf tardir.tar.bz2

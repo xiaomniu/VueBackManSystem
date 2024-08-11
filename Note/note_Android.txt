@@ -1,0 +1,90 @@
+
+刷机包网址：
+    https://xiaomirom.com/ （下载较慢）
+    https://roms.miuier.com/zh-cn/devices/ruby （下载相对快些）
+
+
+黑机补救（至少能进入 fastboot 界面）：
+    使用线刷方式刷入系统
+    线刷包：https://roms.miuier.com/zh-cn/devices/ruby（本次测试使用的是 “V14.0.9.0.SMOCNXM” 版本 线刷包）
+    小米手机刷机工具：https://xiaomirom.com/download-xiaomi-flash-tool-miflash/
+
+    线刷包文件：ruby_images_V14.0.9.0.SMOCNXM_20230808.0000.00_12.0_cn_42a6c7538d.tgz
+        需要进行两次解压，得到 ruby_images_V14.0.9.0.SMOCNXM_20230808.0000.00_12.0_cn 文件夹
+    刷机工具文件：MiFlash2020-3-14-0.rar
+        解压后的文件夹中包含 XiaoMiFlash.exe 文件
+
+    刷机步骤：
+        1. 手机关机，进入 fastboot 模式
+            开机状态下，同时按住音量下键和电源键，进入 fastboot 模式
+        2. 打开刷机工具：XiaoMiFlash.exe
+            选择 ruby_images_V14.0.9.0.SMOCNXM_20230808.0000.00_12.0_cn 文件夹
+            选择 “加载设备” 按钮
+        3. 列表框中会显示 手机设备ID
+        4. 点击 “刷机” 按钮 等待完成即可
+
+    刷机完成后，手机会自动重启，进入系统。随后自行设置语言、时区等。
+
+
+Note12Pro 刷 Magisk 程序：
+    1. 下载 Magisk 程序
+        https://magiskcn.com/magisk-download
+        直接下载最新版即可（本次测试使用的是 Magisk-Stable-27000 版本）
+        下载后是一个 apk文件：Magisk-v27.0.apk，直接在手机上安装即可
+    2. 下载 与当前手机 版本一致的 rom 卡刷包 
+        https://roms.miuier.com/zh-cn/devices/ruby（本次测试使用的是 “V14.0.9.0.SMOCNXM” 版本 卡刷包）
+        下载后是一个 zip 文件：miui_RUBY_V14.0.9.0.SMOCNXM_e0e4cb8094_12.0.zip
+        解压出里的 payload.bin 文件，这个文件需要进一步处理
+    3. 下载 payload_dumper-win64.zip 工具
+        https://miuiver.com/extracting-boot-img/  （小米手机从刷机包提取boot.img文件方法，本次使用的是 python 版本工具）
+        解压后，里面包含 payload_dumper.exe 文件
+        将 payload.bin 文件 放入 payload_input 文件目录中
+    4. 直接运行 payload_dumper.exe，然后等待 完成
+        处理完成后，会在 payload_output 目录中 生成 boot.img 文件，这个文件 就是 magisk 需要处理的文件，然后拷贝至手机存储中
+    5. 进入 Magisk 程序，在 Magicsk 项，点击 “安装” 按钮
+        选择 “选择并修补一个文件” 按钮，选择 第四步 拷贝在手机里的 boot.img 文件
+        等待完成，会生成一个 magisk_patched-27000_pYsZS.img 文件，存放在手机 /sdcard/Download 目录中，然后 将这个 patch 的img 再拷贝到 电脑中
+    6. 将手机进入 fastboot 模式，USB数据线连接上电脑后，然后运行以下命令：
+        fastboot flash boot magisk_patched-27000_pYsZS.img
+        等待完成即可
+    7. 重启手机（也可以使用命令： fastboot reboot 进行重启）
+        进入系统，打开 Magisk 程序，可以看到 Magisk 已安装成功
+    8. 安装 两个 模块（本次 都是先下载模块文件后，考入手机存储中，再在 magisk 的模块项中 使用本地安装的）
+        1. 安装 “riru” 模块
+            https://github.com/RikkaApps/Riru/releases （本次安装的是 riru-v26.1.7.r530.ab3086ec9f-release.zip）
+        2. 安装 “riru LSPosed” 模块
+            https://github.com/LSPosed/LSPosed/releases/tag/v1.9.2 （本次安装的是 LSPosed-v1.9.2-7024-riru-release.zip）
+        安装完后 根据提示 重启手机即可
+        * * * 注意：先安装 “riru” ，然后再 安装 “riru LSPosed”
+    9. 使用 adb.exe 连接手机 进行 USB 调试
+        adb shell 后，可以 使用  “su” 命令 进入到 root 权限
+        第一次 手机上 会提示 要不要 打开 “超级用户” 权限，点击 “打开” 就可以了
+
+
+Reqable 抓包工具 安装系统证书
+    将 Reqable 提供的证书文件：fea81a2f.0 拷入手机 /system/etc/security/cacerts 目录中时，一直提示 “Read-only file system”
+        # 创建一个独立的临时目录，用于存储当前的证书
+        # 如果不这样做，在我们添加挂载后将无法再读取到当前的证书。
+        mkdir -m 700 /data/local/tmp/htk-ca-copy
+        # 复制现有的证书到临时目录
+        cp /system/etc/security/cacerts/* /data/local/tmp/htk-ca-copy/
+        # 在系统证书文件夹之上创建内存挂载点
+        mount -t tmpfs tmpfs /system/etc/security/cacerts
+        # 将之前复制的证书移回内存挂载点中，确保继续信任这些证书
+        mv /data/local/tmp/htk-ca-copy/* /system/etc/security/cacerts/
+        # 将新的证书复制进去，以便我们也信任该证书
+        cp /data/local/tmp/fea81a2f.0 /system/etc/security/cacerts/
+        # 更新权限和SELinux上下文标签，确保一切都和之前一样可读
+        chown root:root /system/etc/security/cacerts/*
+        chmod 644 /system/etc/security/cacerts/*
+        chcon u:object_r:system_file:s0 /system/etc/security/cacerts/*
+        # 删除临时证书目录
+        rm -r /data/local/tmp/htk-ca-copy
+    检查手机 “信任的凭据” 的系统证书 中，多出一个 “Reqable, LLC” 证书
+    如果 有这个 “Reqable, LLC” 证书，证明安装 系统证书成功
+    * * * 注意：这个方式 是 内存文件系统，重启之后肯定就失效了，所以保存成脚本，抓包之前跑一下
+
+
+
+
+        

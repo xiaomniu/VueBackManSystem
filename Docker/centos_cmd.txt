@@ -1,3 +1,6 @@
+查看机器配置
+wget -qO- --no-check-certificate https://raw.githubusercontent.com/oooldking/script/master/superbench.sh | bash
+
 安装node+npm
 yum update
 yum install epel-release

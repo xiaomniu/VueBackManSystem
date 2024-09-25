@@ -129,3 +129,9 @@ mysqldump -h 127.0.0.1 -u root -p xyzwinvite > xyzwinvite240328001.sql
 
 // 查看文件夹大小
 du . -h --max-depth=1
+
+
+debian 安装 docker-compose
+    下载地址：https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64
+    curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose

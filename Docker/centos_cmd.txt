@@ -91,9 +91,9 @@ date -s "$(curl http://s3.amazonaws.com -v 2>&1 | grep "Date: " | awk '{ print $
     yum list docker-ce --showduplicates | sort -r
 5.安装docker
     由于repo中默认只开启stable仓库，故这里安装的是最新版
-        sudo yum install docker-ce
+        sudo yum install docker-ce -y
     也可以指定某个版本安装
-        sudo yum install docker-ce-17.12.1.ce
+        sudo yum install docker-ce-17.12.1.ce -y
 启动docker服务，加入开机启动项
     systemctl enable docker && systemctl start docker
 

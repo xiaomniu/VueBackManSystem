@@ -1,3 +1,12 @@
+
+在CentOS系统中，可以通过多种方式查看系统版本。以下是几种常用的命令：
+cat /etc/centos-release
+    这个命令会显示CentOS的具体版本信息。
+cat /etc/os-release
+    这个命令会显示更详细的系统信息，包括操作系统的ID、版本号等。
+hostnamectl
+    这个命令会显示系统相关的信息，包括操作系统的版本。
+
 查看机器配置
 wget -qO- --no-check-certificate https://raw.githubusercontent.com/oooldking/script/master/superbench.sh | bash
 

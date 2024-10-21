@@ -1,0 +1,45 @@
+Maven 安装配置
+1. 解压 apache-maven-3.9.9-bin.zip 即可完成安装
+2. 配置 增加系统变量 MAVEN_HOME 为 安装路径, 配置环境变量 PATH 为 %MAVEN_HOME%\bin
+3. 配置本地仓库：修改 conf/settings.xml 中的 <localRespository> 为一个指定的目录
+    // "D:\Java\apache-maven-3.9.9\maven_repositroy" 这个目录是自定义创建的
+    <localRepository>D:\Java\apache-maven-3.9.9\maven_repositroy</localRepository>
+4. 配置阿里云镜像：修改 conf/settings.xml 中的 <mirrors> 标签，添加阿里云镜像地址
+<mirror>
+    <id>aliyunmaven</id>
+    <name>aliyun maven</name>
+    <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+    <mirrorOf>central</mirrorOf>
+</mirror>
+    或者
+<mirror>
+    <id>aliyunmaven</id>
+    <mirrorOf>*</mirrorOf>
+    <name>阿里云公共仓库</name>
+    <url>https://maven.aliyun.com/repository/public</url>
+</mirror>
+
+Maven的使用
+    1. 命令
+        compile: 编译
+        clean: 清理
+        test: 测试
+        package: 打包
+        install: 安装到本地仓库
+        deploy: 发布到远程仓库
+    2. 依赖管理
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>2.5.4</version>
+            </dependency>
+        </dependencies>
+
+Maven在 IntellijIdea 中配置
+    File -> Settings -> Build, Execution, Deployment -> Build Tools -> Maven
+    配置如下：
+        Maven home directory: D:\Java\apache-maven-3.9.9
+        User settings file: D:\Java\apache-maven-3.9.9\conf\settings.xml
+        Local repository: D:\Java\apache-maven-3.9.9\maven_repositroy
+    

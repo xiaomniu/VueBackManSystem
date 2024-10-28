@@ -135,3 +135,62 @@ debian 安装 docker-compose
     下载地址：https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64
     curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
+
+debian 安装 boost库 和 openSSL库
+参数解释
+toolset：指定编译器，可选的如msvc-14.3，msvc-14.1msvc-14.0, gcc等，上一步因为我们是在 cmd for VS 2022 的环境中执行的，不需要额外指定此参数。
+stage/install：stage表示只生成库（dll和lib），install会生成并安装到系统中，包含头文件的include目录和CMake文件夹。
+stagedir/prefix：stage时使用stagedir，install时使用prefix，表示编译生成文件的路径，与安装路径。
+link：生成动态链接库/静态链接库。生成动态链接库需使用shared方式，生成静态链接库需使用static方式。
+runtime-link：动态/静态链接运行时库。同样有shared和static两种方式，标记如何连接C++运行库，是包含就用静态，使用系统运行库就用动态。
+architecture：表示架构，也就是你的CPU架构，所以是x86或者arm。
+address-model：地址长度，32表示编译32位的库文件，64表示编译64位的库文件。
+threading：单/多线程编译，single或multi。
+variant：编译debug/release版本。一般都是程序的debug版本对应库的debug版本，所以两个都编译。
+
+mkdir ..\boost_1.83.0_build #创建目录用于保存编译生成的文件，这里为boost_1.83.0_build
+mkdir ..\boost_1.83.0_sdk #再次创建目录用于安装，这里为boost_1.83.0_sdk
+b2 toolset=msvc-14.2 --build-type=complete architecture=x86 address-model=64 variant=debug,release --build-dir="..\boost_1.83.0_build" link=static runtime-link=shared threading=multi install --prefix="..\boost_1.83.0_sdk"
+
+./b2 --prefix=/usr/local/boost_1_80_0 install
+/usr/local/boost_1_80_0
+b2.exe install --build-type=complete architecture=x86 address-model=64 --build-dir="/home/xmn/boostWss/boost_1_80_0/build_tmp" --prefix="/usr/local/lib/boost_1_80_0" link=shared runtime-link=shared threading=multi variant=release
+
+b2.exe install --toolset=msvc-14.3 --build-type=complete architecture=x86 address-model=64 --build-dir="E:/TOOLS/boost_1_86_0/temp_build" --prefix="D:/boost_1_86_0_VC143" link=shared runtime-link=shared threading=multi variant=debug,release
+b2.exe install --toolset=msvc-14.3 --build-type=complete --build-dir="E:/TOOLS/boost_1_86_0/temp_build" --prefix="D:/boost_1_86_0_VC143" link=shared runtime-link=shared runtime-link=static threading=multi debug release
+b2.exe install --prefix="E:/Boost/x64" --build-type=complete --toolset=msvc-14.3 threading=multi --build-type=complete address-model=64
+b2.exe install --prefix="E:/Boost/x86" --build-type=complete --toolset=msvc-14.3 threading=multi --build-type=complete address-model=32
+
+g++ -I /usr/local/boost_1_80_0/include -L /usr/local/boost_1_80_0/lib testBoost.cpp -o testBoost
+
+D:\OpenSSL_3_4_0
+
+perl Configure VC-WIN64A --prefix=D:\OpenSSL_3_4_0
+perl Configure VC-WIN64A --prefix=D:\OpenSSL_3_4_0
+
+apt install zlib1g-dev
+
+wget https://www.openssl.org/source/openssl-3.0.14.tar.gz
+tar -zxvf openssl-3.0.14.tar.gz
+
+./Configure --prefix=/usr/local/openssl-3.0.14 --openssldir=/usr/local/openssl-3.0.14 shared zlib
+# 这将在 /usr/local 目录下创建一个名为 openssl-1.1.1l 的目录，并在该目录下安装 OpenSSL。
+
+make
+make install
+sh -c "echo '/usr/local/openssl-3.0.14/lib64' >> /etc/ld.so.conf.d/openssl-3.0.14.conf"
+ldconfig -v
+
+/usr/local/openssl-3.0.14/bin/openssl version
+
+/usr/local/openssl-3.0.14/include
+/usr/local/openssl-3.0.14/lib64
+
+export CPLUS_INCLUDE_PATH=/usr/local/openssl-3.0.14/include
+export LIBRARY_PATH=/usr/local/openssl-3.0.14/lib64
+
+-L/usr/local/openssl-3.0.14/lib64 -lssl -lcrypto
+
+g++ wss_test2.cpp -I /usr/local/boost_1_80_0/include -L /usr/local/boost_1_80_0/lib -I /usr/local/openssl-3.0.14/include -L /usr/local/openssl-3.0.14/lib64 -lssl -lcrypto -o aa
+g++ wss_test.cpp -I /usr/local/boost_1_80_0/include -L /usr/local/boost_1_80_0/lib -I /usr/local/openssl-3.0.14/include -L /usr/local/openssl-3.0.14/lib64 -lssl -lcrypto -o bb
+

@@ -170,29 +170,53 @@ D:\OpenSSL_3_4_0
 perl Configure VC-WIN64A --prefix=D:\OpenSSL_3_4_0
 perl Configure VC-WIN64A --prefix=D:\OpenSSL_3_4_0
 
-apt install zlib1g-dev
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  debian
+apt install zlib1g-dev -y
+apt install mpi-default-dev libicu-dev libbz2-dev -y
+wget https://sourceforge.net/projects/boost/files/boost/1.86.0/boost_1_86_0.tar.gz/download  -O boost_1_86_0.tar.gz
+tar -zxvf boost_1_86_0.tar.gz
+cd boost_1_86_0
+./bootstrap.sh
+./b2
+./b2 --prefix=/usr/local/boost_1_86_0 install
+export CPLUS_INCLUDE_PATH=/usr/local/boost_1_86_0/include
+export LIBRARY_PATH=/usr/local/boost_1_86_0/lib
 
-wget https://www.openssl.org/source/openssl-3.0.14.tar.gz
-tar -zxvf openssl-3.0.14.tar.gz
+vim boost_1_86_0.cpp
+#include <boost/date_time/gregorian/gregorian.hpp> 
+#include <iostream> 
+int main() 
+{ 
+    boost::gregorian::date d(boost::gregorian::day_clock::local_day());
+    std::cout << d.year() << d.month() <<d.day() << std::endl; 
+}
+g++ -I /usr/local/boost_1_86_0/include -L /usr/local/boost_1_86_0/lib boost_1_86_0.cpp -o boost_1_86_0
 
-./Configure --prefix=/usr/local/openssl-3.0.14 --openssldir=/usr/local/openssl-3.0.14 shared zlib
-# 这将在 /usr/local 目录下创建一个名为 openssl-1.1.1l 的目录，并在该目录下安装 OpenSSL。
+
+wget https://www.openssl.org/source/openssl-3.4.0.tar.gz
+tar -zxvf openssl-3.4.0.tar.gz
+cd openssl-3.4.0
+
+mkdir /usr/local/openssl-3.4.0
+./Configure --prefix=/usr/local/openssl-3.4.0 --openssldir=/usr/local/openssl-3.4.0 shared zlib
 
 make
 make install
-sh -c "echo '/usr/local/openssl-3.0.14/lib64' >> /etc/ld.so.conf.d/openssl-3.0.14.conf"
+sh -c "echo '/usr/local/openssl-3.4.0/lib64' >> /etc/ld.so.conf.d/openssl-3.4.0.conf"
 ldconfig -v
 
-/usr/local/openssl-3.0.14/bin/openssl version
+/usr/local/openssl-3.4.0/bin/openssl version
 
-/usr/local/openssl-3.0.14/include
-/usr/local/openssl-3.0.14/lib64
+/usr/local/openssl-3.4.0/include
+/usr/local/openssl-3.4.0/lib64
 
-export CPLUS_INCLUDE_PATH=/usr/local/openssl-3.0.14/include
-export LIBRARY_PATH=/usr/local/openssl-3.0.14/lib64
+export CPLUS_INCLUDE_PATH=/usr/local/openssl-3.4.0/include
+export LIBRARY_PATH=/usr/local/openssl-3.4.0/lib64
 
--L/usr/local/openssl-3.0.14/lib64 -lssl -lcrypto
+-L/usr/local/openssl-3.4.0/lib64 -lssl -lcrypto
 
-g++ wss_test2.cpp -I /usr/local/boost_1_80_0/include -L /usr/local/boost_1_80_0/lib -I /usr/local/openssl-3.0.14/include -L /usr/local/openssl-3.0.14/lib64 -lssl -lcrypto -o aa
-g++ wss_test.cpp -I /usr/local/boost_1_80_0/include -L /usr/local/boost_1_80_0/lib -I /usr/local/openssl-3.0.14/include -L /usr/local/openssl-3.0.14/lib64 -lssl -lcrypto -o bb
+g++ wss_test2.cpp -I /usr/local/boost_1_86_0/include -L /usr/local/boost_1_86_0/lib -I /usr/local/openssl-3.4.0/include -L /usr/local/openssl-3.4.0/lib64 -lssl -lcrypto -lz -o aa
+g++ wss_test3.cpp -I /usr/local/boost_1_86_0/include -L /usr/local/boost_1_86_0/lib -I /usr/local/openssl-3.4.0/include -L /usr/local/openssl-3.4.0/lib64 -lssl -lcrypto -lz -o bb
+g++ wss_test04.cpp -I /usr/local/boost_1_86_0/include -L /usr/local/boost_1_86_0/lib -I /usr/local/openssl-3.4.0/include -L /usr/local/openssl-3.4.0/lib64 -lssl -lcrypto -lz -o aa
+
 

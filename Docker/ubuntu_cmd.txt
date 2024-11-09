@@ -148,6 +148,8 @@ address-model：地址长度，32表示编译32位的库文件，64表示编译6
 threading：单/多线程编译，single或multi。
 variant：编译debug/release版本。一般都是程序的debug版本对应库的debug版本，所以两个都编译。
 
+tar -zxvf boost_1_82_0.tar.gz
+
 mkdir ..\boost_1.83.0_build #创建目录用于保存编译生成的文件，这里为boost_1.83.0_build
 mkdir ..\boost_1.83.0_sdk #再次创建目录用于安装，这里为boost_1.83.0_sdk
 b2 toolset=msvc-14.2 --build-type=complete architecture=x86 address-model=64 variant=debug,release --build-dir="..\boost_1.83.0_build" link=static runtime-link=shared threading=multi install --prefix="..\boost_1.83.0_sdk"

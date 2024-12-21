@@ -167,3 +167,31 @@ Aws Debian 安装 openjdk-18-jdk
         sudo update-alternatives --config javac
 卸载 Amazon Corretto 11
     dpkg --remove java-18-amazon-corretto-jdk
+
+Ali centos7.6 安装 Python3.11
+    yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make
+    mkdir -p /usr/local/python3
+    wget https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz
+    tar -zxvf Python-3.11.0.tgz
+    cd Python-3.11.0
+    ./configure --prefix=/usr/local/python3
+    make
+    make install
+查看当前软连接，依次执行以下代码
+    ll /usr/local/bin
+    ll /usr/bin/ |grep python3
+创建软连接，依次执行以下代码
+    ln -s /usr/local/python3/bin/python3.11 /usr/bin/python3
+    ln -s /usr/local/python3/bin/pip3.11 /usr/bin/pip3
+配置系统环境变量
+    vi ~/.bash_profile
+    打开配置文件，在最后一行添加配置
+    [export PYTHON_HOME=安装路径 #例如 export PYTHON_HOME=/usr/local/python3]
+    export PYTHON_HOME=/usr/local/python3
+    export PATH=$PYTHON_HOME/bin:$PATH
+执行source使环境变量生效
+    source ~/.bash_profile
+执行echo查看环境变量是否生效
+    echo $PYTHON_HOME
+输入 查看python3版本，出现版本号
+    python3 --version

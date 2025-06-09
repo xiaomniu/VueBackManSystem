@@ -50,6 +50,7 @@ sudo userdel username
 8、删除用户及其主目录
 sudo userdel -r username
 
+Centos7.6 部署nginx DAN佬笔记：
 yum install -y screen wget yum-utils net-tools rsync \
 && yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo \
 && yum install -y docker-ce docker-ce-cli containerd.io
@@ -70,6 +71,58 @@ firewall-cmd --add-masquerade --permanent
 cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 date -s "$(curl http://s3.amazonaws.com -v 2>&1 | grep "Date: " | awk '{ print $3 " " $5 " " $4 " " $7 " " $6 " GMT"}')"
 
+
+腾讯云OpenCloud9 安装 Docker 
+1. 卸载服务器上的 旧版 Docker 避免旧版本冲突
+    sudo dnf remove docker docker-client docker-common docker-selinux -y
+
+2.配置 Docker 的官方仓库源（可选，有的服务器已经配置好了）
+    sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+    其他说明: 为什么要有第2步？
+    答：系统默认仓库可能不包含最新 Docker 版本，通过官方仓库可确保安装最新或特定版本。同时，官方仓库会明确声明软件包依赖关系，避免手动处理依赖冲突（如 containerd.io 版本兼容性问题）。
+
+3.执行正式安装
+    sudo dnf install docker-ce docker-ce-cli containerd.io -y
+
+4.启动 Docker（打开自启动 + 立即启动服务）
+    sudo systemctl enable --now docker
+    sudo systemctl start docker
+    systemctl enable --now docker && systemctl start docker
+
+5.如何确定 Docker 的官方仓库源是否生效
+    答：执行 dnf repolist 可验证新仓库是否添加成功
+    dnf repolist
+
+6.如何禁用步骤2配置的官方仓库？
+    答：若需临时关闭 Docker 仓库，可以通过dnf repolist查询所有repo ，然后找到 Docker 官方仓库的 ID，执行下面的禁用命令：
+    sudo dnf config-manager --set-disabled docker-ce-stable
+
+使用腾讯云镜像源加速 Docker
+    在容器服务集群上使用腾讯云 Docker 软件源
+    无需手动配置，容器服务（Tencent Kubernetes Engine，TKE）集群中的云服务器主机在创建节点时，会自动安装 Docker 服务并配置腾讯云内网镜像。
+
+    根据云服务器的操作系统类型，选择不同的操作步骤。
+        适用于 Debian、CentOS 6 、Fedora、openSUSE 等操作系统，其他版本的操作系统的详细操作步骤略有区别：
+            1.1 执行以下命令，打开 /etc/default/docker 配置文件。
+                vim /etc/default/docker
+            1.2 按 i 切换至编辑模式，添加以下内容，并保存。
+                DOCKER_OPTS="--registry-mirror=https://mirror.ccs.tencentyun.com"
+
+        适用于 Centos 7、Ubuntu 22.04 操作系统
+            1.1 执行以下命令，打开 /etc/docker/daemon.json 配置文件。
+                vim /etc/docker/daemon.json
+            1.2 按 i 切换至编辑模式，添加以下内容，并保存。
+                {
+                    "registry-mirrors": [
+                        "https://mirror.ccs.tencentyun.com"
+                    ]
+                }
+
+        适用于已安装 Boot2Docker 的 Windows 操作系统：
+            1.1 进入 Boot2Docker Start Shell，并执行以下命令：
+                sudo su echo "EXTRA_ARGS=\"–registry-mirror=https://mirror.ccs.tencentyun.com\"" >> /var/lib/boot2docker/profile  exit 
+            1.2 重启 Boot2Docker。
 
 安装 Docker 以与 AWS SAM CLI 一起使用
     1. 更新实例上已安装的程序包和程序包缓存。
